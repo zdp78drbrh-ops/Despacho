@@ -1,0 +1,8 @@
+{% autoescape off %}Hola {{ user.nombre }}:
+
+Pediste definir una nueva contraseña para Despacho. Abre este enlace (vence en 3 días):
+
+{{ protocol }}://{{ domain }}{% url 'password_reset_confirm' uidb64=uid token=token %}
+
+Si no lo pediste, ignora este correo.
+{% endautoescape %}

@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block main %}
+<div class="crumb"><a href="{% url 'tablero' %}">Litigios</a> · Apelaciones y amparos</div>
+<div class="h"><h1>Apelaciones y amparos<span>{{ tram|length }} en trámite</span></h1><div class="hdr-acts" style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn p" data-modal="{% url 'recurso_nuevo' %}">+ Registrar recurso</button></div></div>
+<div class="cols c2"><div>
+  {% for t, lista in grupos %}<div class="card"><h3>{{ t }}</h3>{% for e, x in lista %}{% include "litigios/_rec_row.html" %}{% endfor %}</div>
+  {% empty %}<div class="card"><div class="empty">Ninguno en trámite.</div></div>{% endfor %}
+</div><div>
+  <div class="card"><h3>Resueltos</h3>{% for e, x in resueltos %}{% include "litigios/_rec_row.html" %}{% empty %}<div class="empty">Ninguno todavía.</div>{% endfor %}</div>
+  <div class="card"><h3>Etapas por tipo de recurso</h3>{% for t, c in catalogo.items %}<div class="row"><div><b>{{ t }}</b><div class="m">{{ c.organo }} · {{ c.etapas|join:" → " }}</div></div></div>{% endfor %}<div class="note">Estas etapas son la referencia general; la etapa de cada recurso se puede fijar a mano al editarlo.</div></div>
+</div></div>
+{% endblock %}

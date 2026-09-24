@@ -1,0 +1,8 @@
+{% autoescape off %}Hola {{ user.nombre }}:
+
+Se te dio de alta en Despacho · Gestión jurídica. Para entrar, define tu contraseña con este enlace (vence en 3 días):
+
+{{ protocol }}://{{ domain }}{% url 'password_reset_confirm' uidb64=uid token=token %}
+
+Tu usuario es este correo: {{ user.email }}
+{% endautoescape %}

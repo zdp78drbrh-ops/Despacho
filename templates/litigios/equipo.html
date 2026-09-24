@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block main %}
+<div class="h"><h1>Equipo y tareas<span>lo que cada quien tiene en la mesa</span></h1><div class="hdr-acts" style="display:flex;gap:6px;flex-wrap:wrap"><a class="btn" href="{% url 'configuracion' %}">Administrar equipo</a></div></div>
+{% if col1 %}<div class="cols c2"><div>{% for t in col1 %}{% include "litigios/_equipo_card.html" %}{% endfor %}</div><div>{% for t in col2 %}{% include "litigios/_equipo_card.html" %}{% endfor %}</div></div>
+{% else %}<div class="card"><div class="empty">Da de alta a tu equipo en Configuración.</div></div>{% endif %}
+{% endblock %}

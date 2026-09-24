@@ -1,0 +1,3 @@
+<div class="card"><h3>Expedientes<span class="lnk" data-modal="{% url 'expediente_nuevo' %}">+ Nuevo</span></h3>
+<div class="filters">{% for m in materias %}<a href="?materia={{ m|urlencode }}"><span class="{% if materia == m %}on{% endif %}">{{ m }}</span></a>{% endfor %}</div>
+{% for e in lista %}{% include "litigios/_exp_row.html" with derecha="" %}{% empty %}<div class="empty">Sin expedientes en este filtro.</div>{% endfor %}</div>

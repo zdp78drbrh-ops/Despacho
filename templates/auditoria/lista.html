@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block main %}
+<div class="crumb"><a href="{% url 'configuracion' %}">Configuración</a> · Bitácora de auditoría</div>
+<div class="h"><h1>Bitácora de auditoría<span>solo lectura · {{ pagina.paginator.count }} eventos</span></h1><div class="hdr-acts" style="display:flex;gap:6px;flex-wrap:wrap"><a class="btn" href="?{{ base }}&verificar=1">Verificar integridad</a><a class="btn" href="?{{ base }}&csv=1">Exportar CSV</a></div></div>
+{% if integra is True %}<div class="welcome" style="background:var(--grn-bg);color:var(--grn-t)"><b>Cadena íntegra</b>Ningún evento fue alterado ni borrado.</div>{% elif integra is False %}<div class="welcome" style="background:var(--red-bg);color:var(--red-t)"><b>La cadena está rota</b>Se detectó una alteración. Avisa al administrador de inmediato.</div>{% endif %}
+<div class="card"><form method="get" class="filters" style="align-items:center;gap:8px;padding:6px 0">
+<select name="usuario"><option value="">Todos los usuarios</option>{% for u in usuarios %}<option value="{{ u.pk }}" {% if g.usuario == u.pk|stringformat:"s" %}selected{% endif %}>{{ u.nombre }}</option>{% endfor %}</select>
+<select name="entidad"><option value="">Todo</option>{% for x in entidades %}<option {% if g.entidad == x %}selected{% endif %}>{{ x }}</option>{% endfor %}</select>
+<select name="accion"><option value="">Todas las acciones</option>{% for x in acciones %}<option {% if g.accion == x %}selected{% endif %}>{{ x }}</option>{% endfor %}</select>
+<input type="date" name="desde" value="{{ g.desde }}"> <input type="date" name="hasta" value="{{ g.hasta }}">
+<input type="search" name="q" value="{{ g.q }}" placeholder="Texto o id"><button class="btn sm p">Filtrar</button></form>
+<div class="tw"><table><tr><th>Fecha</th><th>Usuario</th><th>Acción</th><th>Registro</th><th>Detalle</th></tr>
+{% for e in pagina %}<tr><td style="white-space:nowrap">{{ e.fecha|date:"d/m/Y H:i:s" }}</td><td>{{ e.usuario_nombre }}<br><span class="mini">{{ e.ip|default:"" }}</span></td><td>{{ e.accion }}</td><td>{{ e.entidad }} {{ e.entidad_id }}</td><td><span class="mini">{{ e.descripcion }}</span>{% if e.datos %}<pre class="json">{{ e.datos }}</pre>{% endif %}</td></tr>
+{% empty %}<tr><td colspan="5" class="empty">Sin eventos.</td></tr>{% endfor %}</table></div>
+<div class="note">{% if pagina.has_previous %}<a href="?{{ base }}&p={{ pagina.previous_page_number }}">← Anteriores</a> · {% endif %}Página {{ pagina.number }} de {{ pagina.paginator.num_pages }}{% if pagina.has_next %} · <a href="?{{ base }}&p={{ pagina.next_page_number }}">Siguientes →</a>{% endif %}</div></div>
+{% endblock %}

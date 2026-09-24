@@ -1,0 +1,54 @@
+# Especificación para DigitalOcean App Platform (doctl apps create --spec .do/app.yaml).
+# Los valores marcados CAMBIAR se llenan en el panel de DigitalOcean como variables cifradas (SECRET).
+name: despacho
+region: sfo
+alerts:
+  - rule: DEPLOYMENT_FAILED
+# Variables para todos los componentes (web, programador, migrar)
+envs:
+  - {key: DATABASE_URL, scope: RUN_TIME, value: "${db.DATABASE_URL}"}
+  - {key: DJANGO_SECRET_KEY, scope: RUN_TIME, type: SECRET, value: CAMBIAR}
+  - {key: DJANGO_ALLOWED_HOSTS, scope: RUN_TIME, value: "sistema.tudespacho.mx,${APP_DOMAIN}"}
+  - {key: DJANGO_CSRF_TRUSTED_ORIGINS, scope: RUN_TIME, value: "https://sistema.tudespacho.mx"}
+  - {key: SITIO_URL, scope: RUN_TIME, value: "https://sistema.tudespacho.mx"}
+  - {key: S3_BUCKET, scope: RUN_TIME, value: despacho-pdf}
+  - {key: S3_ENDPOINT_URL, scope: RUN_TIME, value: "https://sfo3.digitaloceanspaces.com"}
+  - {key: S3_REGION, scope: RUN_TIME, value: sfo3}
+  - {key: S3_ACCESS_KEY, scope: RUN_TIME, type: SECRET, value: CAMBIAR}
+  - {key: S3_SECRET_KEY, scope: RUN_TIME, type: SECRET, value: CAMBIAR}
+  - {key: EMAIL_HOST_PASSWORD, scope: RUN_TIME, type: SECRET, value: CAMBIAR}
+  - {key: DEFAULT_FROM_EMAIL, scope: RUN_TIME, value: "Despacho <sistema@tudespacho.mx>"}
+  - {key: RESPALDO_BUCKET, scope: RUN_TIME, value: despacho-respaldos}
+  - {key: RESPALDO_ENDPOINT_URL, scope: RUN_TIME, value: "https://s3.us-west-004.backblazeb2.com"}
+  - {key: RESPALDO_ACCESS_KEY, scope: RUN_TIME, type: SECRET, value: CAMBIAR}
+  - {key: RESPALDO_SECRET_KEY, scope: RUN_TIME, type: SECRET, value: CAMBIAR}
+databases:
+  - name: db
+    engine: PG
+    version: "16"
+    production: true
+    cluster_name: despacho-db   # crear antes el clúster administrado (Basic, 1 GB) con este nombre
+    db_name: despacho
+    db_user: despacho_app
+jobs:
+  - name: migrar
+    kind: PRE_DEPLOY
+    dockerfile_path: Dockerfile
+    github: {repo: zdp78drbrh-ops/Despacho, branch: main, deploy_on_push: true}
+    run_command: python manage.py migrate --noinput
+    instance_size_slug: apps-s-1vcpu-0.5gb
+services:
+  - name: web
+    dockerfile_path: Dockerfile
+    github: {repo: zdp78drbrh-ops/Despacho, branch: main, deploy_on_push: true}
+    http_port: 8000
+    instance_size_slug: apps-s-1vcpu-1gb
+    instance_count: 1
+    health_check: {http_path: /salud/}
+workers:
+  - name: programador
+    dockerfile_path: Dockerfile
+    github: {repo: zdp78drbrh-ops/Despacho, branch: main, deploy_on_push: true}
+    run_command: python manage.py programador
+    instance_size_slug: apps-s-1vcpu-0.5gb
+    instance_count: 1

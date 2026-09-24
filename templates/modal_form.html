@@ -1,0 +1,12 @@
+<h2>{{ titulo }}</h2>
+<form class="mf" method="post" action="{{ action }}"{% if multipart %} enctype="multipart/form-data"{% endif %} novalidate>{% csrf_token %}
+{% if clientes is not None %}<datalist id="lista-clientes">{% for c in clientes %}<option value="{{ c }}">{% endfor %}</datalist>{% endif %}
+{% if recursos_json %}{{ recursos_json|json_script:"recursos-json" }}{% endif %}
+{% for fila in form.filas %}{% if fila|length == 2 %}<div class="f2">{% endif %}
+{% for f in fila %}{% if f.widget_type == "checkbox" %}<div class="f inline">{{ f }}<label for="{{ f.id_for_label }}" style="margin:0">{{ f.label }}</label></div>
+{% else %}<div class="f"><label for="{{ f.id_for_label }}">{{ f.label }}{% if f.field.required %} *{% endif %}</label>{{ f }}{% with p=form|pista_de:f.name %}{% if p %}<div class="hint">{{ p|safe }}</div>{% endif %}{% endwith %}</div>
+{% endif %}{% endfor %}
+{% if fila|length == 2 %}</div>{% endif %}{% endfor %}
+<div class="err" id="ferr">{{ error }}</div>
+<div class="macts">{% if extra %}<button type="button" class="btn danger" data-post="{{ extra.url }}" data-confirm="{{ extra.confirmar }}">Eliminar</button>{% endif %}<button type="button" class="btn" data-cerrar>Cancelar</button><button type="submit" class="btn p">{{ submit }}</button></div>
+</form>

@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block main %}
+<div class="crumb"><a href="{% url 'tablero' %}">Litigios</a> · Expedientes</div>
+<div class="h"><h1>{{ titulo }}{% if sub %}<span>{{ sub }}</span>{% endif %}</h1><div class="hdr-acts" style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn p" data-modal="{% url 'expediente_nuevo' %}">+ Nuevo expediente</button></div></div>
+{% include "litigios/_expedientes_card.html" %}
+{% endblock %}

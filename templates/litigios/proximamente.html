@@ -1,0 +1,5 @@
+{% extends "base.html" %}
+{% block main %}
+<div class="h"><h1>{{ titulo }}</h1></div>
+<div class="card"><div class="empty">Este módulo se construye en la fase {{ fase }} del plan. Mientras tanto, los litigios de cada cliente se llevan en <a href="{% url 'tablero' %}">Litigios</a>.</div></div>
+{% endblock %}

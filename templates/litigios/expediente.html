@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Expediente {{ e.numero }} · Despacho{% endblock %}
+{% block main %}
+<div class="crumb"><a href="{% url 'tablero' %}">Litigios</a> · <a href="{% url 'expedientes' %}">Expedientes</a> · {{ e.numero }}</div>
+<div class="h"><h1>Expediente {{ e.numero }}{% if e.tipo %}<span>{{ e.tipo }}</span>{% endif %}</h1><div class="hdr-acts" style="display:flex;gap:6px;flex-wrap:wrap"></div></div>
+<div class="hdr"><div class="top"><div><div class="t">{{ e.cliente.razon }} <span style="color:var(--t3);font-weight:400">vs</span> {{ e.contraparte|default:"—" }}</div><div class="s">{{ e.materia }} · {{ e.caracter }} · Abogado responsable: {{ e.responsable.nombre|default:"—" }}</div></div>
+  <div class="acts">{% if e.estado == "terminado" %}<span class="chip grn">Terminado</span>{% elif e.estado == "sentencia" %}<span class="chip gry">En espera de sentencia</span>{% else %}<span class="chip blu">Activo</span>{% endif %}{% if e.esperando_auto %}<span class="chip gry">Esperando auto</span>{% endif %}{% if urg %}<span class="chip {{ urg.cls }}">{{ urg.txt }}</span>{% endif %}<button class="btn" data-modal="{% url 'expediente_editar' e.pk %}">Editar</button><button class="btn" data-modal="{% url 'expediente_informe' e.pk %}">Informe al cliente</button><button class="btn p" data-modal="{% url 'accion_nueva' e.pk %}">+ Agregar acción</button></div></div>
+  <div class="grid">
+    <div><div class="l">Juzgado</div><div class="v">{{ e.juzgado }}</div></div>
+    <div><div class="l">Año</div><div class="v">{{ e.anio }}</div></div>
+    <div><div class="l">Etapa procesal</div><div class="v">{{ e.etapa }} <span class="lnk" data-modal="{% url 'expediente_etapa' e.pk %}">cambiar</span></div></div>
+    <div><div class="l">Próxima audiencia</div><div class="v">{% if e.audiencia %}{{ e.audiencia|fmt:True }}{% else %}—{% endif %}</div></div>
+    <div><div class="l">Última actuación</div><div class="v">{% if u %}{{ u.fecha|fmt:True }} · {{ u.texto }}{% else %}Sin actuaciones{% endif %}</div></div>
+    <div><div class="l">Realizada por</div><div class="v">{% if u %}{{ u.quien_nombre }}{% else %}—{% endif %}</div></div>
+    <div><div class="l">Cuantía</div><div class="v">{{ e.cuantia|dinero }}</div></div>
+    <div><div class="l">Estado del expediente</div><div class="v"><span class="lnk" data-modal="{% url 'expediente_estado' e.pk %}">{% if e.estado == "activo" %}Activo · cambiar{% elif e.estado == "sentencia" %}Citado a sentencia · cambiar{% else %}Terminado · cambiar{% endif %}</span></div></div>
+  </div></div>
+<div class="cols c21"><div>
+  <div class="card"><h3>Próximas acciones a realizar</h3>
+  <div class="tw"><table><tr><th style="min-width:180px">Documento, promoción o acto</th><th>Responsable</th><th>Plazo</th><th>Revisa</th><th>Aprueba</th><th>Estado</th><th></th></tr>
+  {% for a in acciones %}<tr class="{% if a.terminada %}done{% endif %}"><td><b>{{ a.titulo }}</b>{% if a.recurso %} <span class="chip {% if a.recurso.promovente == 'Nosotros' %}blu{% else %}amb{% endif %}" style="font-weight:500">{{ a.recurso.tipo }}</span>{% endif %}<br><span class="mini">{{ a.tipo }}{% if a.notas %} · {{ a.notas }}{% endif %}{% if a.acuse %} · {{ a.acuse }}{% endif %}</span></td><td>{{ a.responsable.nombre|default:"—" }}</td><td style="{{ a.estilo_plazo }}">{% if a.plazo %}{{ a.plazo|fmt }}{% else %}—{% endif %}</td><td>{{ a.revisa.nombre|default:"—" }}</td><td>{{ a.aprueba.nombre|default:"—" }}</td><td>{% chip a.chip_estado %}</td><td style="white-space:nowrap">{% if a.btn %}{% if a.btn.0 == "terminar" %}<button class="btn sm p" data-modal="{% url 'accion_terminar' a.pk %}">Terminar</button>{% elif a.puede %}<form method="post" action="{% url 'accion_avanzar' a.pk %}" style="display:inline"{% if a.confirmar %} data-confirm="{{ a.confirmar }}" data-confirm-label="Aprobar"{% endif %}>{% csrf_token %}{% if a.confirmar %}<input type="hidden" name="confirmado" value="1">{% endif %}<button class="btn sm">{{ a.btn.1 }}</button></form>{% else %}<button class="btn sm" disabled title="Solo quien aprueba">{{ a.btn.1 }}</button>{% endif %}{% endif %} <span class="lnk" data-modal="{% url 'accion_editar' a.pk %}">editar</span></td></tr>
+  {% empty %}<tr><td colspan="7" class="empty">Sin acciones. Agrega la primera.</td></tr>{% endfor %}</table></div>
+  <div class="note">Flujo: pendiente → en elaboración → en revisión → aprobada → terminada. Solo se puede marcar terminada una acción aprobada (o sin revisor ni aprobador). Al terminar una promoción o escrito, el expediente queda en espera de auto hasta que registres el acuerdo.</div></div>
+
+  <div class="card"><h3>Apelaciones y amparos<span><span class="lnk" data-modal="{% url 'recurso_nuevo_exp' e.pk %}?tipo=Apelación">+ Apelación</span> · <span class="lnk" data-modal="{% url 'recurso_nuevo_exp' e.pk %}?tipo=Amparo%20directo">+ Amparo</span> · <span class="lnk" data-modal="{% url 'recurso_nuevo_exp' e.pk %}">+ Otro recurso</span></span></h3>
+  {% for x in recursos %}<div style="padding:10px 0;border-top:1px solid var(--line2)">
+    <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap"><div><b style="font-size:13.5px">{{ x.titulo }}</b><div class="m">{{ x.organo }}{% if x.fecha_interposicion %} · interpuesto {{ x.fecha_interposicion|fmt:True }}{% endif %}{% if x.promovente %} · promovido por {% if x.promovente == "Nosotros" %}nosotros{% else %}la contraparte{% endif %}{% endif %}</div>{% if x.acto_impugnado %}<div class="m">Contra: {{ x.acto_impugnado }}</div>{% endif %}{% if x.notas %}<div class="m">{{ x.notas }}</div>{% endif %}</div><div class="r">{% chip x.chip %}{% chip x.chip_suspension %}</div></div>
+    {% if x.estado != "resuelto" %}<div style="margin-top:8px"><div style="display:flex;justify-content:space-between;font-size:12px"><span><b>Etapa:</b> {{ x.etapa }} <span class="mini">({{ x.etapa_idx|add:1 }} de {{ x.etapas|length }})</span></span><span class="mini">{% if x.siguiente_etapa %}Sigue: {{ x.siguiente_etapa }}{% else %}Última etapa{% endif %}</span></div><div style="height:5px;background:var(--line);border-radius:3px;margin-top:5px;overflow:hidden"><div style="height:100%;width:{{ x.avance_pct }}%;background:var(--acc)"></div></div></div>{% endif %}
+    <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:8px">
+      {% if x.estado != "resuelto" %}<form method="post" action="{% url 'recurso_avanzar' x.pk %}" style="display:inline">{% csrf_token %}<button class="btn sm p" {% if not x.siguiente_etapa %}disabled{% endif %}>Avanzar etapa</button></form><form method="post" action="{% url 'recurso_regresar' x.pk %}" style="display:inline">{% csrf_token %}<button class="btn sm" {% if x.etapa_idx <= 0 %}disabled{% endif %}>Regresar</button></form><button class="btn sm" data-modal="{% url 'accion_nueva' e.pk %}?recurso={{ x.pk }}">+ Acción</button><button class="btn sm" data-modal="{% url 'recurso_resolver' x.pk %}">Resolver</button>{% else %}<form method="post" action="{% url 'recurso_reabrir' x.pk %}" style="display:inline">{% csrf_token %}<button class="btn sm">Reabrir</button></form>{% endif %}
+      <span class="lnk" data-modal="{% url 'recurso_editar' x.pk %}">editar</span>
+      <span class="mini" style="margin-left:auto">{% with n=x.pendientes|length %}{% if n %}{{ n }} acci{% if n > 1 %}ones{% else %}ón{% endif %} pendiente{{ n|pluralize }} en la tabla de arriba{% else %}sin acciones pendientes{% endif %}{% endwith %}</span>
+    </div></div>
+  {% empty %}<div class="empty">Sin recursos. Registra aquí la apelación o el amparo que se interponga contra la sentencia (o que interponga la contraparte), y lleva sus etapas por separado de la primera instancia.</div>{% endfor %}</div>
+
+  <div class="card"><h3>Bitácora del expediente<span class="lnk" data-modal="{% url 'bitacora_nueva' e.pk %}">+ Anotar</span></h3>
+  {% for b in bitacora %}<div class="row"><div><b>{{ b.fecha|fmt:True }} · {{ b.texto }}</b><div class="m">{{ b.quien_nombre }}</div></div></div>{% empty %}<div class="empty">Sin registros.</div>{% endfor %}</div>
+</div><div>
+  <div class="card"><h3>Expediente digitalizado<span class="lnk" data-modal="{% url 'documento_nuevo' e.pk %}">+ Registrar documento</span></h3>
+  {% for d in documentos %}<div class="row"><div><b>{% if d.archivo %}<a href="{% url 'documento_descargar' d.pk %}" target="_blank" rel="noopener">{{ d.nombre }}</a>{% else %}{{ d.nombre }}{% endif %}</b><div class="m">{{ d.fecha|fmt:True }} · {{ d.quien_nombre }}{% if d.archivo %} · PDF{% else %} · <span class="lnk" data-modal="{% url 'documento_adjuntar' d.pk %}">adjuntar PDF</span>{% endif %}</div></div><div class="r"><span class="lnk" data-post="{% url 'documento_quitar' d.pk %}" data-confirm="¿Quitar este documento de la lista?" data-confirm-label="Quitar">quitar</span></div></div>
+  {% empty %}<div class="empty">Aún no hay constancias registradas. Registra cada documento con su fecha y adjunta el PDF.</div>{% endfor %}</div>
+  <div class="card"><h3>Datos de las partes</h3>
+    <div class="row"><div><b>{{ e.caracter|default:"Cliente" }}</b><div class="m">{{ e.cliente.razon }}</div></div></div>
+    <div class="row"><div><b>Contraparte</b><div class="m">{{ e.contraparte|default:"—" }}</div></div></div>
+    <div class="row"><div><b>Acuerdos registrados</b><div class="m">{% for a in acuerdos %}{{ a.fecha|fmt }}: {{ a.sintesis }}{% if not forloop.last %}<br>{% endif %}{% empty %}Ninguno{% endfor %}</div></div></div>
+  </div>
+</div></div>
+{% endblock %}

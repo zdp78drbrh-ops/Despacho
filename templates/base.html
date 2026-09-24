@@ -1,0 +1,50 @@
+{% load static %}<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{% block title %}Despacho · Gestión jurídica{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/despacho.css' %}">
+<script>try{var t=localStorage.getItem('despacho_tema');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+</head>
+<body>
+{% with n=request.resolver_match.url_name %}
+<div class="topbar"><b id="tbTitle">Despacho</b><button id="tbMenu" aria-label="Menú">Menú</button></div>
+<div class="app">
+  <nav class="side" id="side">
+    <div class="brand">Despacho<small>Gestión jurídica</small></div>
+    {% if n in "tablero expedientes expedientes_filtro expediente acuerdos recursos" %}{% with lit=1 %}
+    <a class="nav on" href="{% url 'tablero' %}">Litigios</a>
+    <a class="sub {% if n == 'tablero' %}on{% endif %}" href="{% url 'tablero' %}">Tablero del día</a>
+    <a class="sub {% if n == 'expedientes' or n == 'expedientes_filtro' or n == 'expediente' %}on{% endif %}" href="{% url 'expedientes' %}">Expedientes</a>
+    <a class="sub {% if n == 'acuerdos' %}on{% endif %}" href="{% url 'acuerdos' %}">Acuerdos publicados</a>
+    <a class="sub {% if n == 'recursos' %}on{% endif %}" href="{% url 'recursos' %}">Apelaciones y amparos</a>
+    {% endwith %}{% else %}
+    <a class="nav" href="{% url 'tablero' %}">Litigios</a>
+    {% endif %}
+    <a class="nav {% if n == 'corporativo' %}on{% endif %}" href="{% url 'corporativo' %}">Servicios corporativos</a>
+    <a class="nav {% if n == 'calendario' %}on{% endif %}" href="{% url 'calendario' %}">Calendario</a>
+    <a class="nav {% if n == 'equipo' %}on{% endif %}" href="{% url 'equipo' %}">Equipo y tareas</a>
+    <div class="navsec">Administración</div>
+    <a class="nav {% if n == 'configuracion' or n == 'auditoria' %}on{% endif %}" href="{% url 'configuracion' %}">Configuración</a>
+    <div class="yo">Sesión de
+      <div style="color:#fff;font-weight:600;margin-top:4px">{{ user.nombre }}</div>
+      <div>{{ user.get_rol_display }}</div>
+      <form method="post" action="{% url 'salir' %}" style="margin-top:6px">{% csrf_token %}
+        <a href="{% url 'contrasena_cambiar' %}" style="color:var(--side-t)">Cambiar contraseña</a> ·
+        <button type="submit" style="background:none;border:none;color:var(--side-t);padding:0;cursor:pointer">Salir</button>
+      </form>
+      <div class="sync">Datos compartidos con el equipo</div>
+    </div>
+  </nav>
+  <main class="main" id="main">{% block main %}{% endblock %}</main>
+</div>
+{% endwith %}
+<div id="modal"></div>
+<div class="toast" id="toast"></div>
+<script id="mensajes" type="application/json">[{% for m in messages %}"{{ m|escapejs }}"{% if not forloop.last %},{% endif %}{% endfor %}]</script>
+<script src="{% static 'js/despacho.js' %}"></script>
+</body>
+</html>

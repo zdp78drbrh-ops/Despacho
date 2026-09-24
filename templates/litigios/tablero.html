@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block main %}
+<div class="h"><h1>Litigios<span>{{ hoy|fmt_largo }}</span></h1><div class="hdr-acts" style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn p" data-modal="{% url 'expediente_nuevo' %}">+ Nuevo expediente</button></div></div>
+{% if vacio %}<div class="welcome"><b>Todavía no hay datos</b>Empieza dando de alta a tu equipo en Configuración y después registra el primer expediente.<br><a class="btn p" href="{% url 'configuracion' %}">Ir a configuración</a></div>{% endif %}
+<div class="metrics">
+  <a class="metric" href="{% url 'expedientes' %}" style="color:inherit"><div class="l">Expedientes activos</div><div class="v">{{ activos|length }}</div></a>
+  <a class="metric" href="{% url 'expedientes_filtro' 'urgentes' %}" style="color:inherit"><div class="l">Por vencer o sin impulso</div><div class="v" style="color:{% if urg %}var(--red-t){% else %}inherit{% endif %}">{{ urg|length }}</div></a>
+  <a class="metric" href="{% url 'expedientes_filtro' 'sentencia' %}" style="color:inherit"><div class="l">En espera de sentencia</div><div class="v">{{ sent|length }}</div></a>
+  <a class="metric" href="{% url 'expedientes_filtro' 'terminados' %}" style="color:inherit"><div class="l">Terminados</div><div class="v">{{ term|length }}</div></a>
+</div>
+<div class="legend"><span><i class="dot" style="background:var(--red)"></i>Vence en 3 días o menos, o más de 60 días sin actuación</span><span><i class="dot" style="background:var(--amb)"></i>Vence esta semana, o más de 30 días sin actuación</span><span><i class="dot" style="background:var(--gry)"></i>En espera del juzgado</span></div>
+<div class="cols c3">
+  <div>
+    <div class="card"><h3>Acuerdos publicados hoy<span class="lnk" data-modal="{% url 'acuerdo_nuevo' %}">+ Registrar</span></h3>
+      {% for a in acuerdos_hoy %}{% with e=a.expediente %}<div class="row click" data-href="{% url 'expediente' e.pk %}"><div><b>{{ e.titulo }}</b><div class="m">{{ e.juzgado }} · {{ a.sintesis }}</div></div><div class="r">{% if a.accion %}<span class="chip {{ a.chip_cls }}">{{ a.accion }}{% if a.plazo %} · {{ a.plazo|fmt }}{% endif %}</span>{% endif %}</div></div>{% endwith %}
+      {% empty %}<div class="empty">Nada registrado hoy. Captura lo que salió en la lista de acuerdos.</div>{% endfor %}
+      <div class="note"><a href="{% url 'acuerdos' %}">Ver acuerdos de otros días</a></div>
+    </div>
+    <div class="card"><h3>Por actuar o en espera de auto</h3>
+      {% for e in esperando %}{% include "litigios/_exp_row.html" with derecha='<span class="chip gry">Esperando auto</span>' %}{% endfor %}
+      {% for e, p in por_actuar %}{% if p %}{% include "litigios/_exp_row_actuar.html" with titulo=p.titulo %}{% else %}{% include "litigios/_exp_row_actuar.html" with titulo="Actuar" %}{% endif %}{% endfor %}
+      {% if not esperando and not por_actuar %}<div class="empty">Nada pendiente fuera de lo urgente.</div>{% endif %}
+    </div>
+    <div class="card"><h3>Apelaciones y amparos en trámite<a href="{% url 'recursos' %}">Ver todos</a></h3>
+      {% for e, x in recursos %}{% include "litigios/_rec_row.html" %}{% empty %}<div class="empty">Ninguno en trámite.</div>{% endfor %}
+    </div>
+  </div>
+  <div>
+    <div class="card"><h3>Por vencer o sin impulso procesal<a href="{% url 'expedientes_filtro' 'urgentes' %}">Ver todos</a></h3>
+      {% for e, u in urg|slice:":8" %}{% with p=e.proximo_plazo %}<div class="row click" data-href="{% url 'expediente' e.pk %}"><div><b>{{ e.titulo }}</b><div class="m">{% if p %}{{ p.titulo }} · {{ p.responsable.nombre|default:"" }}{% else %}Sin acciones registradas{% endif %}</div></div><div class="r"><span class="chip {{ u.cls }}">{{ u.txt }}</span></div></div>{% endwith %}
+      {% empty %}<div class="empty">Nada por vencer. Buen día.</div>{% endfor %}
+    </div>
+    <div class="card"><h3>En espera de sentencia<a href="{% url 'expedientes_filtro' 'sentencia' %}">Ver los {{ sent|length }}</a></h3>{% for e in sent|slice:":4" %}{% include "litigios/_exp_row_etapa.html" %}{% empty %}<div class="empty">Ninguno.</div>{% endfor %}</div>
+    <div class="card"><h3>Terminados<a href="{% url 'expedientes_filtro' 'terminados' %}">Ver los {{ term|length }}</a></h3>{% for e in term|slice:":3" %}{% include "litigios/_exp_row.html" with derecha='<span class="chip grn">Cerrado</span>' %}{% empty %}<div class="empty">Ninguno.</div>{% endfor %}</div>
+  </div>
+  <div>{% include "litigios/_expedientes_card.html" %}</div>
+</div>
+{% endblock %}

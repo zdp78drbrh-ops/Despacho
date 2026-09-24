@@ -1,0 +1,5 @@
+{% extends "base.html" %}
+{% block main %}<div class="h"><h1>Cambiar contraseña</h1></div>
+<div class="card" style="max-width:480px;padding:14px 16px"><form method="post">{% csrf_token %}{% include "registration/_campos.html" %}
+<div class="note">Mínimo 10 caracteres; no uses datos personales ni contraseñas comunes.</div>
+<div class="macts"><button class="btn p" type="submit">Guardar</button></div></form></div>{% endblock %}

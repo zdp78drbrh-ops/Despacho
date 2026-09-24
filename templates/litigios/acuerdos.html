@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block main %}
+<div class="crumb"><a href="{% url 'tablero' %}">Litigios</a> · Acuerdos</div>
+<div class="h"><h1>Acuerdos publicados</h1><div class="hdr-acts" style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn p" data-modal="{% url 'acuerdo_nuevo' %}?volver={% url 'acuerdos' %}">+ Registrar acuerdo</button></div></div>
+{% for d, lista in dias %}<div class="card"><h3>{{ d|fmt_largo }}</h3>
+{% for a in lista %}{% with e=a.expediente %}<div class="row click" data-href="{% url 'expediente' e.pk %}"><div><b>{{ e.titulo }}</b><div class="m">{{ a.sintesis }} · registró {{ a.registrado_por_nombre }}</div></div><div class="r">{% if a.accion %}<span class="chip {% if a.accion == 'Solo registrar' %}gry{% else %}blu{% endif %}">{{ a.accion }}{% if a.plazo %} · {{ a.plazo|fmt }}{% endif %}</span>{% endif %}</div></div>{% endwith %}{% endfor %}
+</div>{% empty %}<div class="card"><div class="empty">Sin acuerdos registrados.</div></div>{% endfor %}
+{% endblock %}

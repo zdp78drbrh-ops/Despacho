@@ -19,14 +19,12 @@ pantallas, flujos, textos y reglas se conservan tal cual. Lo que cambia es la ba
 
 ### Documentos de referencia (fuente de verdad)
 
-Deben vivir en `docs/referencia/` (pendiente de subir, ver "Estado actual"):
-
-- `prototipo.html` — prototipo funcional. **Si hay duda sobre una regla, manda el prototipo.**
-- Manual de operación.
-- Bosquejo del sistema.
-
-Si el manual o el bosquejo contradicen al prototipo, **no decidir solo**: anotarlo en
-"Decisiones pendientes" y preguntar.
+- `docs/referencia/prototipo.html` — prototipo funcional. **Si hay duda sobre una regla, manda el prototipo.**
+  ⚠️ El archivo subido en la sesión 2 es una versión **anterior** a la que se pegó en el chat de la sesión 1:
+  no trae "Apelaciones y amparos" (`RECURSOS`, `recCard`, `VIEWS.recursos`, expedientes e9/e10). El sistema
+  implementa la versión **con** apelaciones y amparos (la pegada), porque así lo piden los requisitos. Si se
+  consigue ese archivo, reemplazar `docs/referencia/prototipo.html` con él.
+- El manual de operación y el bosquejo se omitieron por decisión del despacho (sesión 2).
 
 ## 2. Reglas del prototipo que no se pueden romper
 
@@ -87,16 +85,17 @@ Toda regla de esta lista debe tener una prueba automatizada que la cubra.
 ## 3. Arquitectura
 
 ```
-Navegador (HTML del servidor + CSS del prototipo + htmx)
+Navegador (HTML del servidor + CSS del prototipo + static/js/despacho.js)
         │ HTTPS
         ▼
 Aplicación Django (Python 3.12) ──► PostgreSQL 16 (datos + bitácora de auditoría)
    │   │                           
    │   └─► Almacenamiento de objetos S3 privado (PDF)   
    │                                                     
-   └─ Tareas programadas (cron del servidor):
-        · 07:00 revisar plazos → correo (servicio transaccional)
-        · 02:00 respaldo BD + verificación de la cadena de auditoría → copia externa
+   └─ Proceso `programador` (worker aparte, manage.py programador):
+        · 02:00 verificación de la cadena de auditoría + respaldo BD + réplica de PDF → Backblaze B2
+        · 03:00 limpieza de sesiones
+        · 07:00 revisar plazos → correo (fase 2)
 ```
 
 ### Decisiones técnicas y por qué
@@ -104,11 +103,11 @@ Aplicación Django (Python 3.12) ──► PostgreSQL 16 (datos + bitácora de a
 | Pieza | Elección | Motivo |
 |---|---|---|
 | Backend | **Django 5** (Python) | Autenticación, contraseñas (Argon2), grupos/permisos, formularios, migraciones, admin e i18n en español listos. Menos código propio que mantener. |
-| Interfaz | **Plantillas Django + htmx**, CSS del prototipo copiado tal cual | Conserva las pantallas exactamente; no hace falta una SPA. Los modales del prototipo se sirven como fragmentos htmx. |
+| Interfaz | **Plantillas Django + ~100 líneas de JS propio** (`static/js/despacho.js`), CSS del prototipo copiado tal cual | Conserva las pantallas exactamente; no hace falta una SPA ni dependencias JS. Los modales son fragmentos HTML que se piden con `fetch` (cabecera `X-Requested-With: fetch`); al guardar, el servidor responde 204 + `X-Despacho-Redirect`. Sin JS, el modal se abre como página. |
 | Base de datos | **PostgreSQL** administrado | Transacciones, triggers para la bitácora inmutable, respaldos y PITR del proveedor. |
 | Archivos | **Bucket S3 privado** (DigitalOcean Spaces) con versionado | Los PDF no pasan por disco del servidor; descarga con URL firmada de 5 min tras validar permisos. |
 | Correo del sistema | **Resend** (API transaccional) | Plan gratuito suficiente (≈3,000 correos/mes); SPF/DKIM en el dominio del despacho. |
-| Tareas | Comandos `manage.py` en cron / job programado | Sin colas ni Redis en fase 1; basta para 4–15 usuarios. |
+| Tareas | Comando `programador` en un *worker* de App Platform | Sin colas ni Redis; basta para 4–15 usuarios. |
 | Despliegue | Docker; DigitalOcean App Platform | Sin administrar servidores; HTTPS automático. |
 | CI | GitHub Actions | Lint (ruff), pruebas (pytest) y migraciones en cada push. |
 
@@ -132,7 +131,7 @@ Identificadores del dominio en español, igual que el prototipo.
   eliminado_en). "Quitar" = baja lógica; el archivo se conserva.
 - `EventoAuditoria` — ver abajo.
 - `DiaInhabil` (calendario, fecha, descripción) y `Calendario` (p. ej. "Poder Judicial de Querétaro",
-  "Poder Judicial de la Federación").
+  "Poder Judicial de la Federación") — **fase 2**, aún no existen.
 - `NotificacionEnviada` (acción, tipo, fecha) para no repetir correos.
 
 ### Roles y permisos
@@ -143,13 +142,17 @@ Identificadores del dominio en español, igual que el prototipo.
 | Registrar acuerdos, anotar bitácora, subir PDF | ✓ | ✓ | ✓ | ✓ |
 | Crear/editar expedientes y acciones | ✓ | ✓ | ✓ | ✓ |
 | Iniciar / enviar a revisión | ✓ | ✓ | ✓ | ✓ |
-| **Aprobar** una acción | ✓ | — | — | — |
+| **Aprobar** una acción | ✓ | solo si la acción no tiene aprobador y él es el revisor | — | — |
 | Terminar una acción | ✓ | ✓ | ✓ | ✓ (con las reglas del flujo) |
-| Eliminar (baja lógica) expedientes/documentos | ✓ | — | — | — |
-| Usuarios, catálogos, días inhábiles | admin | admin | admin | admin |
+| Quitar documentos, eliminar acciones y recursos (baja lógica) | ✓ | ✓ | ✓ | ✓ |
+| Eliminar (baja lógica) expedientes | ✓ | — | — | — |
+| Consultar la bitácora de auditoría | ✓ | — | — | — (salvo admin) |
+| Usuarios (alta, rol, desactivar, enviar acceso) | admin | admin | admin | admin |
 
 Aprobar una acción asignada a otro aprobador pide confirmación (como el prototipo) y queda registrado
-en la auditoría. Ver "Decisiones pendientes" #1.
+en la auditoría (`aprobo_en_lugar_de`). En "editar acción" solo se puede regresar el estado o avanzar sin
+saltarse la aprobación; "Terminada" solo con el botón Terminar. Implementado en `litigios/reglas.py`
+(`puede_aprobar`) y `litigios/servicios.py` (`estados_permitidos_en_edicion`).
 
 ### Bitácora de auditoría inmutable
 - Tabla `evento_auditoria`: fecha-hora, usuario, IP, acción (`crear`, `editar`, `cambiar_estado`,
@@ -247,7 +250,7 @@ Precios aproximados de lista a sep-2026, en USD, **más IVA 16%**; verificar al 
 | Cuenta | Para qué | Costo aprox. |
 |---|---|---|
 | GitHub (ya existe) | Código y CI | Gratis |
-| DigitalOcean | App Platform (app + cron) | ~$12/mes |
+| DigitalOcean | App Platform: `web` (~$12) + `programador` (~$5) | ~$17/mes |
 |  | PostgreSQL administrado (respaldos + PITR) | ~$15/mes |
 |  | Spaces (PDF, 250 GB incluidos) | ~$5/mes |
 | Dominio `.mx` o `.com.mx` (Akky, Neubox o similar) | `sistema.tudespacho.mx` | ~MXN 400–700/año |
@@ -255,10 +258,30 @@ Precios aproximados de lista a sep-2026, en USD, **más IVA 16%**; verificar al 
 | Backblaze B2 | Copia externa de respaldos | ~$1–2/mes |
 | Correo del despacho (opcional si ya tienen) | Buzones de las personas: Google Workspace o Microsoft 365 | ~$6–8 por usuario/mes |
 
-Total del sistema: **≈ US$35–40/mes** (≈ MXN 750–850 con IVA) + dominio. Alternativa económica
+Total del sistema: **≈ US$40–45/mes** (≈ MXN 750–850 con IVA) + dominio. Alternativa económica
 (un solo servidor con Docker, ~US$20/mes) posible, pero con más mantenimiento: no recomendada.
 
-## 6. Convenciones de trabajo
+## 6. Mapa del código
+
+```
+despacho/        settings (todo por variables de entorno), urls, settings_pruebas
+cuentas/         Usuario (login por correo, roles), bloqueo por intentos, middleware de sesión obligatoria,
+                 Configuración → Equipo (alta con invitación por correo)
+auditoria/       EventoAuditoria + migración 0002 (triggers de inmutabilidad y cadena de hash en PostgreSQL),
+                 servicios.auditar()/Actor, pantalla de consulta y CSV
+litigios/        catalogos.py (copiados del prototipo) · reglas.py (funciones puras) · servicios.py (escrituras +
+                 auditoría) · models.py · forms.py (formModal) · views.py · informes.py
+                 management: cargar_ejemplo (seed del prototipo), importar_prototipo (JSON de "Exportar respaldo")
+nucleo/          fechas.py (fmt, fmt_largo, días hábiles) · respaldos.py · comandos respaldar, verificar_auditoria,
+                 programador
+templates/       base.html (barra lateral del prototipo), modal_form.html, litigios/*, cuentas/*, registration/*
+static/          css/despacho.css (CSS del prototipo sin cambios) · js/despacho.js
+tests/           reglas, flujos, auditoría, web (pytest, contra PostgreSQL real)
+ops/sql/roles.sql, .do/app.yaml, Dockerfile, docker-compose.yml, .github/workflows/ci.yml
+docs/operacion.md  puesta en marcha, tareas automáticas, prueba de restauración mensual
+```
+
+## 7. Convenciones de trabajo
 
 - Interfaz 100 % en español; textos copiados del prototipo cuando existan.
 - Código: nombres del dominio en español (`expediente`, `accion`, `esperando_auto`); comentarios breves en español.
@@ -270,22 +293,39 @@ Total del sistema: **≈ US$35–40/mes** (≈ MXN 750–850 con IVA) + dominio.
 - Antes de hacer push: `ruff check`, `pytest`, `python manage.py makemigrations --check`.
 - Secretos solo en variables de entorno; nunca en el repositorio.
 
-## 7. Decisiones pendientes (preguntar al despacho)
+## 8. Decisiones
 
-1. **Aprobación**: ¿solo el aprobador asignado puede aprobar, o cualquier usuario con rol Aprueba
-   (con confirmación, como el prototipo)? Propuesta: cualquier rol Aprueba, con confirmación y auditoría.
-2. **Semáforo**: ¿rojo/ámbar en días naturales (prototipo) o hábiles? Propuesta: naturales en fase 1.
-3. **Alta de clientes en fase 1**: el prototipo captura el cliente como texto en el expediente; propuesta:
-   selector con alta rápida para poder agrupar PDF por cliente.
-4. **Correo de rojo**: ¿también para "más de 60 días sin actuación"? Propuesta: sí, en resumen semanal.
-5. ¿El auxiliar puede ver cuantías y datos de todos los expedientes? Propuesta: sí (como el prototipo).
-6. Dominio y nombre definitivo del sistema.
+En la sesión 2 el despacho pidió construir sin esperar respuestas; se adoptaron las propuestas. Cualquiera
+se puede revertir si el despacho lo pide.
 
-## 8. Estado actual
+1. ✅ (provisional) Aprueba cualquier usuario con rol Aprueba (confirmación + auditoría si no es el asignado);
+   si la acción no tiene aprobador, su revisor puede aprobarla.
+2. ✅ (provisional) Semáforo en días naturales, como el prototipo.
+3. ✅ (provisional) Cliente capturado con lista de sugerencias (`datalist`); si no existe se crea al guardar.
+4. ⏳ Correo por "más de 60 días sin actuación": propuesta de resumen semanal en fase 2.
+5. ✅ (provisional) Todos ven todo, como el prototipo.
+6. ⏳ Dominio y nombre definitivo (en `.do/app.yaml` está `sistema.tudespacho.mx` como marcador).
+7. ✅ "Quitar" documento, eliminar acción/recurso: cualquiera (como el prototipo), siempre baja lógica.
+   Eliminar expediente: solo rol Aprueba.
+8. ✅ La bitácora visible y los acuerdos publicados son de solo alta en la base (no hay edición en el prototipo).
 
-- [x] Plan y arquitectura acordados en este archivo (sesión 1, 24-sep-2026).
-- [ ] Subir a `docs/referencia/` el prototipo, el manual de operación y el bosquejo
-      (en la sesión 1 solo se recibió el prototipo pegado en el chat; la carpeta del repo estaba vacía).
-- [ ] Respuestas a "Decisiones pendientes".
-- [ ] Cuentas de la sección 5 creadas y credenciales cargadas como variables de entorno.
-- [ ] Fase 0.
+## 9. Estado actual
+
+- [x] Plan y arquitectura (sesión 1, 24-sep-2026).
+- [x] `docs/referencia/prototipo.html` subido (versión anterior, ver §1).
+- [x] **Fase 0** en código: proyecto Django, PostgreSQL, CSS del prototipo, plantilla base, login, Docker,
+      `.do/app.yaml`, CI. *Falta desplegar* (requiere las cuentas de §5).
+- [x] **Fase 1** en código (sesión 2): usuarios/roles/login/recuperación, bloqueo por intentos, todos los modelos,
+      auditoría inmutable encadenada, tablero, expedientes, ficha, acciones con flujo y aprobación, esperando auto,
+      semáforo, acuerdos, apelaciones y amparos, PDF (subir/adjuntar/descargar/quitar), informe al cliente,
+      calendario y equipo (solo litigios), consulta de auditoría, respaldos + programador, importador del prototipo,
+      datos de ejemplo. 83 pruebas en verde; recorrido en navegador (escritorio y móvil) sin errores de JS.
+- [ ] Crear cuentas de §5, desplegar, primer administrador y **primera prueba de restauración** (docs/operacion.md §4).
+      Con eso se cierra la fase 1 ("listo cuando": expediente real de punta a punta + restauración exitosa).
+- [ ] Probar respaldos contra B2 real (el volcado y la restauración ya se probaron en local; la subida a S3 no).
+- [ ] Fase 2: días inhábiles, correos de plazo en rojo (tabla `NotificacionEnviada` ya existe), resumen semanal.
+
+### Cómo retomar
+`pip install -r requirements-dev.txt`, PostgreSQL 16 local (`DATABASE_URL`), `python manage.py migrate`,
+`python manage.py cargar_ejemplo`, `DJANGO_DEBUG=1 python manage.py runserver`. Usuarios de ejemplo:
+`abraham@ejemplo.mx` (aprueba, admin), `yairsinio@`, `mariana@`, `diego@ejemplo.mx` · `despacho-demo-2026`.

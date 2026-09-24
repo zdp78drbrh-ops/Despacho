@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Despacho · Gestión jurídica</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --page:#f3f3ef;--card:#ffffff;--card2:#f7f7f4;--side:#1f2a37;--side2:#2f4a6b;--side-t:#c9d1db;--side-m:#8b98a8;
+  --t1:#24262a;--t2:#63625c;--t3:#9a998f;--line:#e2e1da;--line2:#eeede8;
+  --acc:#185FA5;--acc-bg:#E6F1FB;--acc-t:#0C447C;
+  --red-bg:#FCEBEB;--red-t:#791F1F;--red:#E24B4A;
+  --amb-bg:#FAEEDA;--amb-t:#633806;--amb:#EF9F27;
+  --grn-bg:#EAF3DE;--grn-t:#27500A;--grn:#639922;
+  --gry-bg:#EDECE6;--gry-t:#444441;--gry:#B4B2A9;
+  --radius:9px;--font:'IBM Plex Sans','Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --page:#191b1e;--card:#23262b;--card2:#2a2e34;--side:#111519;--side2:#2b3e57;--side-t:#c9d1db;--side-m:#7d8a9a;
+  --t1:#ecebe6;--t2:#a8a79f;--t3:#77766f;--line:#33373d;--line2:#2c3035;
+  --acc:#7fb3ea;--acc-bg:#16304a;--acc-t:#b5d4f4;
+  --red-bg:#4a1c1c;--red-t:#f7c1c1;--amb-bg:#4a3510;--amb-t:#fac775;--grn-bg:#22391a;--grn-t:#c0dd97;--gry-bg:#33363a;--gry-t:#d3d1c7;
+}}
+:root[data-theme="dark"]{
+  --page:#191b1e;--card:#23262b;--card2:#2a2e34;--side:#111519;--side2:#2b3e57;--side-t:#c9d1db;--side-m:#7d8a9a;
+  --t1:#ecebe6;--t2:#a8a79f;--t3:#77766f;--line:#33373d;--line2:#2c3035;
+  --acc:#7fb3ea;--acc-bg:#16304a;--acc-t:#b5d4f4;
+  --red-bg:#4a1c1c;--red-t:#f7c1c1;--amb-bg:#4a3510;--amb-t:#fac775;--grn-bg:#22391a;--grn-t:#c0dd97;--gry-bg:#33363a;--gry-t:#d3d1c7;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*:before,*:after{box-sizing:inherit}
+html,body{height:100%}
+body{margin:0;background:var(--page);color:var(--t1);font-family:var(--font);font-size:14px;line-height:1.45}
+a{color:var(--acc);text-decoration:none;cursor:pointer}
+button,input,select,textarea{font:inherit;color:inherit}
+.app{display:flex;min-height:100%}
+.side{width:224px;flex-shrink:0;background:var(--side);color:var(--side-t);padding:22px 14px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
+.brand{color:#fff;font-size:17px;font-weight:600;padding:0 10px;margin-bottom:22px}
+.brand small{display:block;color:var(--side-m);font-size:11px;font-weight:400;margin-top:2px}
+.nav{display:block;padding:9px 12px;border-radius:7px;margin-bottom:3px;color:var(--side-t);font-size:13.5px}
+.nav:hover{background:rgba(255,255,255,.06)}
+.nav.on{background:var(--side2);color:#fff;font-weight:600}
+.sub{display:block;padding:6px 12px 6px 26px;font-size:12.5px;color:var(--side-m)}
+.sub.on{color:#fff}
+.navsec{margin:16px 0 6px;font-size:11px;color:#6f7d8e;padding-left:12px}
+.side .yo{margin-top:auto;padding:10px 4px 0;border-top:1px solid rgba(255,255,255,.08);font-size:12px;color:var(--side-m)}
+.side .yo select{width:100%;margin-top:6px;background:rgba(255,255,255,.06);color:#fff;border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:6px 8px}
+.side .sync{font-size:11px;color:var(--side-m);margin-top:8px}
+.main{flex:1;min-width:0;padding:22px 28px 60px}
+.topbar{display:none}
+.crumb{font-size:12px;color:var(--t3);margin-bottom:4px}
+.crumb a{color:var(--t2)}
+.h{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+.h h1{font-size:20px;margin:0;font-weight:600}
+.h h1 span{color:var(--t3);font-weight:400;font-size:13px;margin-left:8px}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.metric{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px;cursor:pointer}
+.metric .l{font-size:12px;color:var(--t2)}
+.metric .v{font-size:26px;font-weight:600;margin-top:2px}
+.cols{display:grid;gap:16px}
+.c2{grid-template-columns:1fr 1fr}.c3{grid-template-columns:1fr 1fr 1fr}.c21{grid-template-columns:1.6fr 1fr}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:4px 16px;margin-bottom:16px}
+.card h3{font-size:13.5px;margin:10px 0 4px;display:flex;justify-content:space-between;align-items:center;font-weight:600;gap:8px}
+.card h3 a,.card h3 .lnk{font-size:12px;font-weight:400}
+.row{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:9px 0;border-top:1px solid var(--line2);font-size:13px}
+.row:first-of-type,.row.first{border-top:none}
+.row.click{cursor:pointer}
+.row.click:hover b{color:var(--acc)}
+.row b{display:block;font-weight:600;font-size:13px}
+.row .m{color:var(--t2);font-size:12px;margin-top:1px}
+.row .r{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
+.empty{color:var(--t3);font-size:12.5px;padding:10px 0}
+.chip{font-size:11px;padding:2px 9px;border-radius:99px;white-space:nowrap;font-weight:600;display:inline-block;line-height:1.6}
+.red{background:var(--red-bg);color:var(--red-t)}.amb{background:var(--amb-bg);color:var(--amb-t)}.blu{background:var(--acc-bg);color:var(--acc-t)}.grn{background:var(--grn-bg);color:var(--grn-t)}.gry{background:var(--gry-bg);color:var(--gry-t)}
+.filters{display:flex;gap:6px;margin:8px 0 4px;flex-wrap:wrap}
+.filters span{font-size:11.5px;padding:3px 10px;border-radius:99px;border:1px solid var(--line);color:var(--t2);cursor:pointer}
+.filters span.on{background:var(--acc-bg);border-color:transparent;color:var(--acc-t);font-weight:600}
+.btn{display:inline-flex;align-items:center;padding:7px 13px;border-radius:7px;border:1px solid var(--line);background:var(--card);font-size:12.5px;cursor:pointer;white-space:nowrap}
+.btn:hover{background:var(--card2)}
+.btn.p{background:var(--acc);color:#fff;border-color:var(--acc);font-weight:600}
+.btn.p:hover{filter:brightness(1.08)}
+.btn.sm{padding:4px 9px;font-size:11.5px}
+.btn.danger{color:var(--red-t)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.hdr{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;margin-bottom:16px}
+.hdr .t{font-size:19px;font-weight:600;line-height:1.3}
+.hdr .s{color:var(--t2);font-size:12.5px;margin-top:3px}
+.hdr .top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.hdr .acts{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px 18px;margin-top:14px}
+.grid .l{font-size:11.5px;color:var(--t2)}
+.grid .v{font-size:13px;font-weight:600;margin-top:1px}
+table{width:100%;border-collapse:collapse;font-size:12.5px;margin:4px 0 8px}
+th{text-align:left;font-size:11.5px;color:var(--t2);font-weight:400;padding:6px 8px 6px 0;border-bottom:1px solid var(--line)}
+td{padding:8px 8px 8px 0;border-bottom:1px solid var(--line2);vertical-align:top}
+tr.done td{color:var(--t3)}
+.tw{overflow-x:auto;max-width:100%}
+.steps{display:flex;gap:6px;margin-top:16px}
+.step{flex:1;font-size:11.5px;color:var(--t3);padding-top:7px;border-top:4px solid var(--line);text-align:center}
+.step.done{border-color:var(--grn);color:var(--grn-t)}
+.step.on{border-color:var(--acc);color:var(--acc-t);font-weight:600}
+.av{width:30px;height:30px;border-radius:50%;background:var(--acc-bg);color:var(--acc-t);display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;margin-right:10px;flex-shrink:0}
+.chk{display:inline-block;width:15px;height:15px;border:1.5px solid var(--t3);border-radius:3px;vertical-align:-3px;margin-right:6px;cursor:pointer}
+.chk.on{background:var(--grn);border-color:var(--grn);color:#fff;font-size:10px;text-align:center;line-height:13px}
+.legend{display:flex;gap:14px;font-size:11.5px;color:var(--t2);margin:0 0 12px;flex-wrap:wrap}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+.note{font-size:12px;color:var(--t2);padding:6px 0 10px}
+.lnk{color:var(--acc);cursor:pointer;font-size:12px}
+.mini{font-size:11.5px;color:var(--t2)}
+/* modal */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:flex-start;justify-content:center;padding:6vh 12px 20px;z-index:50;overflow-y:auto}
+.md{background:var(--card);border-radius:12px;width:100%;max-width:560px;padding:20px 22px;border:1px solid var(--line)}
+.md h2{font-size:16px;margin:0 0 14px;font-weight:600}
+.f{margin-bottom:12px}
+.f label{display:block;font-size:12px;color:var(--t2);margin-bottom:4px}
+.f input,.f select,.f textarea{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:7px;background:var(--card2);color:var(--t1)}
+.f textarea{min-height:70px;resize:vertical}
+.f .hint{font-size:11px;color:var(--t3);margin-top:3px}
+.f.inline{display:flex;gap:8px;align-items:center}
+.f.inline input[type=checkbox]{width:auto}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+.macts{display:flex;justify-content:flex-end;gap:8px;margin-top:16px;flex-wrap:wrap}
+.err{color:var(--red-t);font-size:12px;margin-top:6px}
+.toast{position:fixed;bottom:calc(18px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--t1);color:var(--page);padding:9px 16px;border-radius:8px;font-size:13px;z-index:60;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.show{opacity:1}
+.welcome{background:var(--acc-bg);color:var(--acc-t);border-radius:var(--radius);padding:14px 16px;margin-bottom:16px;font-size:13px}
+.welcome b{display:block;margin-bottom:4px;font-size:14px}
+.welcome .btn{margin-top:8px;margin-right:6px}
+pre.json{background:var(--card2);border:1px solid var(--line);border-radius:7px;padding:10px;font-size:11px;max-height:220px;overflow:auto;white-space:pre-wrap;word-break:break-all}
+.cal-day{margin-bottom:14px}
+.cal-day h4{font-size:12.5px;margin:0 0 4px;color:var(--t2);font-weight:600}
+.cal-day.over h4{color:var(--red-t)}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+@media (max-width:960px){
+  .side{display:none;position:fixed;inset:0;width:100%;height:100vh;z-index:40;padding-top:calc(60px + env(safe-area-inset-top,0px))}
+  .side.open{display:flex}
+  .topbar{display:flex;position:sticky;top:env(safe-area-inset-top,0px);z-index:45;background:var(--side);color:#fff;padding:12px 16px;align-items:center;justify-content:space-between;padding-top:calc(12px + env(safe-area-inset-top,0px))}
+  .topbar b{font-size:15px}
+  .topbar button{background:none;border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:6px;padding:4px 10px}
+  .main{padding:16px 14px 60px}
+  .metrics{grid-template-columns:1fr 1fr}
+  .c2,.c3,.c21{grid-template-columns:1fr}
+  .grid{grid-template-columns:1fr 1fr}
+  .steps{flex-wrap:wrap}.step{min-width:30%}
+  .f2{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion: reduce){.toast{transition:none}}
+</style>
+</head>
+<body>
+<div class="topbar"><b id="tbTitle">Despacho</b><button id="tbMenu" aria-label="Menú">Menú</button></div>
+<div class="app">
+  <nav class="side" id="side"></nav>
+  <main class="main" id="main"></main>
+</div>
+<div id="modal"></div>
+<div class="toast" id="toast"></div>
+<script>
+/* ---------- utilidades ---------- */
+const $ = s => document.querySelector(s);
+const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const MESES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+const DIAS = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+const pad = n => String(n).padStart(2,'0');
+function todayISO(){ const d=new Date(); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
+function parseISO(s){ if(!s) return null; const [y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d); }
+function fmt(s, withYear){ const d=parseISO(s); if(!d) return '—'; const y = withYear || d.getFullYear()!==new Date().getFullYear(); return `${d.getDate()} ${MESES[d.getMonth()]}${y?' '+d.getFullYear():''}`; }
+function fmtLong(s){ const d=parseISO(s); if(!d) return ''; return `${DIAS[d.getDay()]} ${d.getDate()} de ${['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'][d.getMonth()]} de ${d.getFullYear()}`; }
+function daysUntil(s){ const d=parseISO(s); if(!d) return null; const t=parseISO(todayISO()); return Math.round((d-t)/86400000); }
+function daysSince(s){ const n=daysUntil(s); return n==null?null:-n; }
+function addDays(s,n){ const d=parseISO(s); d.setDate(d.getDate()+n); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
+function addBusinessDays(s,n){ let d=parseISO(s); let c=0; while(c<n){ d.setDate(d.getDate()+1); if(d.getDay()!==0&&d.getDay()!==6) c++; } return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
+function plazoChip(s, label){ const n=daysUntil(s); if(n==null) return ''; let cls='blu', txt=label||fmt(s); if(n<0){cls='red';txt=`Venció ${fmt(s)}`;} else if(n===0){cls='red';txt='Vence hoy';} else if(n===1){cls='red';txt='Vence mañana';} else if(n<=3){cls='red';txt=`Vence en ${n} días`;} else if(n<=7){cls='amb';txt=`Vence en ${n} días`;} else {txt=`Vence ${fmt(s)}`;} return `<span class="chip ${cls}">${txt}</span>`; }
+function money(n){ if(n==null||n==='') return '—'; return '$'+Number(n).toLocaleString('es-MX',{minimumFractionDigits:2}); }
+function initials(n){ return String(n||'').replace(/^(Lic\.|Ing\.|Arq\.|Dr\.|Dra\.|C\.P\.)\s*/i,'').split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0].toUpperCase()).join(''); }
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),2200); }
+function go(hash){ location.hash = hash; }
+function byDateDesc(a,b){ return (b.fecha||'').localeCompare(a.fecha||''); }
+
+/* ---------- catálogos ---------- */
+const MATERIAS = ['Civil','Mercantil','Familiar','Penal','Amparo','Laboral','Administrativo'];
+const ETAPAS = ['Presentación de demanda','Emplazamiento','Contestación','Audiencia preliminar','Desahogo de pruebas','Alegatos','Citado a sentencia','Sentencia','Apelación','Amparo','Ejecución','Convenio'];
+const TIPOS_ACCION = ['Promoción','Escrito','Acto procesal','Diligencia','Gestión','Audiencia'];
+const EST_ACC = {pendiente:['Pendiente','gry'], elaboracion:['En elaboración','blu'], revision:['En revisión','amb'], aprobada:['Aprobada','grn'], terminada:['Terminada','grn']};
+const FLUJO_ACC = ['pendiente','elaboracion','revision','aprobada','terminada'];
+const EST_CON = {elaboracion:['En elaboración','blu'], revision:['En revisión','amb'], aprobacion:['Por aprobar','amb'], aprobado:['Aprobado','grn'], firmado:['Firmado','grn']};
+const FLUJO_CON = ['elaboracion','revision','aprobacion','aprobado','firmado'];
+const CARPETAS = ['Acta constitutiva y estatutos','Actas de asamblea y libros corporativos','Poderes notariales','Constancias fiscales y RPC','Permisos y licencias','Contratos firmados','Otros'];
+const RIESGOS = {alto:['Riesgo alto','red'], medio:['Riesgo medio','amb'], bajo:['Riesgo bajo','gry']};
+const ETAPAS_TRAM = [['documentacion','Documentación'],['ingreso','Ingreso'],['prevencion','Prevención'],['resolucion','Resolución'],['entrega','Entrega al cliente'],['concluido','Concluido']];
+const TIPOS_TRAM = {
+  'Licencia de construcción':['Escritura de propiedad y libertad de gravamen','Dictamen de uso de suelo','Alineamiento y número oficial','Identificación y poder del representante','Proyecto arquitectónico y memoria de cálculo','Visto bueno de Protección Civil','Comprobante de pago de derechos'],
+  'Dictamen de uso de suelo':['Escritura de propiedad','Identificación del solicitante','Croquis de localización','Comprobante de pago de derechos'],
+  'Licencia de funcionamiento':['Acta constitutiva','Poder del representante','Constancia de situación fiscal','Uso de suelo','Visto bueno de Protección Civil','Comprobante de pago de derechos'],
+  'Visto bueno de Protección Civil':['Programa interno de protección civil','Dictamen estructural','Plano del inmueble','Comprobante de pago'],
+  'Registro de marca (IMPI)':['Solicitud de registro','Diseño de la marca','Comprobante de pago de tarifa','Poder del representante'],
+  'Aviso de beneficiario controlador':['Acta constitutiva','Libro de accionistas actualizado','Identificaciones de beneficiarios'],
+  'Otro':[]
+};
+
+/* ---------- estado y persistencia ---------- */
+const KINDS = ['expedientes','clientes','tramites','acuerdos','usuarios'];
+const S = {expedientes:[], clientes:[], tramites:[], acuerdos:[], usuarios:[]};
+let db = null, dbReady = false, dbSubs = [];
+const LS = 'despacho_proto_v1';
+function lsLoad(){ try{ const raw=localStorage.getItem(LS); if(!raw) return false; const o=JSON.parse(raw); KINDS.forEach(k=>{ S[k]=Array.isArray(o[k])?o[k]:[]; }); return true; }catch(e){ return false; } }
+function lsSave(){ try{ localStorage.setItem(LS, JSON.stringify(S)); }catch(e){} }
+const writeQ = {};
+function dbWrite(kind, obj){ if(!db) return; const key=kind+'/'+obj.id; const prev=writeQ[key]||Promise.resolve(); writeQ[key]=prev.then(()=>db.collection(kind).doc(obj.id).set(JSON.parse(JSON.stringify(obj)))).catch(e=>{ console.warn('db set',e); if(e&&e.code==='invalid_argument') toast('No tienes permiso para guardar cambios compartidos'); }); }
+function dbDelete(kind, id){ if(!db) return; db.collection(kind).doc(id).delete().catch(e=>console.warn('db del',e)); }
+function persist(kind, obj){ const i=S[kind].findIndex(x=>x.id===obj.id); if(i<0) S[kind].push(obj); else S[kind][i]=obj; lsSave(); dbWrite(kind,obj); }
+function removeItem(kind, id){ S[kind]=S[kind].filter(x=>x.id!==id); lsSave(); dbDelete(kind,id); }
+function yo(){ try{ return localStorage.getItem('despacho_yo')||''; }catch(e){ return ''; } }
+function setYo(n){ try{ localStorage.setItem('despacho_yo',n); }catch(e){} }
+function quien(){ return yo() || (S.usuarios[0]&&S.usuarios[0].nombre) || 'Sin asignar'; }
+
+async function connectDb(){
+  try{
+    if(!window.claude||!window.claude.use) return;
+    const d = await window.claude.use('db');
+    if(!d) return;
+    db = d;
+    KINDS.forEach(k=>{
+      const un = db.collection(k).onSnapshot(snap=>{
+        const docs = snap.docs.filter(x=>x.exists).map(x=>x.data());
+        if(!dbReady && docs.length===0 && S[k].length>0 && !snap.metadata.fromCache){
+          // la base compartida está vacía y hay datos locales: subirlos una sola vez
+          S[k].forEach(o=>dbWrite(k,o));
+        } else if(!snap.metadata.fromCache || docs.length){
+          S[k] = docs;
+          lsSave();
+          render();
+        }
+        if(!snap.metadata.fromCache) dbReady = true;
+        renderSide();
+      }, err=>{ console.warn('db sub',err); });
+      dbSubs.push(un);
+    });
+  }catch(e){ console.warn('db',e); }
+}
+
+/* ---------- datos de ejemplo ---------- */
+function seed(){
+  const T = todayISO();
+  const usuarios = [
+    {id:'u1', nombre:'Abraham Jassen', rol:'Socio director (aprueba)'},
+    {id:'u2', nombre:'Lic. Yairsinio García', rol:'Abogado senior (revisa)'},
+    {id:'u3', nombre:'Lic. Mariana Ruiz', rol:'Abogada (elabora)'},
+    {id:'u4', nombre:'Diego Mora', rol:'Auxiliar jurídico'},
+  ];
+  const bit = (d, t, q) => ({id:uid(), fecha:d, texto:t, quien:q});
+  const expedientes = [
+    {id:'e1', numero:'312/2025', anio:'2025', juzgado:'Juzgado 2° Civil, Querétaro', materia:'Mercantil', tipo:'Oral mercantil', cliente:'Constructora del Bajío, S.A. de C.V.', contraparte:'Grupo Torres, S.A.', caracter:'Actor', responsable:'Lic. Mariana Ruiz', etapa:'Desahogo de pruebas', audiencia:addDays(T,21), estado:'activo', cuantia:4850000, esperandoAuto:false,
+      acciones:[
+        {id:uid(), titulo:'Escrito de designación de perito', tipo:'Promoción', responsable:'Lic. Mariana Ruiz', plazo:addDays(T,3), revisa:'Lic. Yairsinio García', aprueba:'Abraham Jassen', estado:'revision', notas:'Perito en ingeniería civil'},
+        {id:uid(), titulo:'Preparar audiencia de desahogo', tipo:'Audiencia', responsable:'Abraham Jassen', plazo:addDays(T,21), revisa:'', aprueba:'', estado:'pendiente', notas:''},
+        {id:uid(), titulo:'Solicitar copias certificadas', tipo:'Promoción', responsable:'Lic. Mariana Ruiz', plazo:addDays(T,7), revisa:'Lic. Yairsinio García', aprueba:'Abraham Jassen', estado:'elaboracion', notas:''},
+        {id:uid(), titulo:'Ofrecimiento de pruebas', tipo:'Promoción', responsable:'Lic. Mariana Ruiz', plazo:addDays(T,-4), revisa:'Lic. Yairsinio García', aprueba:'Abraham Jassen', estado:'terminada', acuse:'Acuse 19 sep', terminadaEl:addDays(T,-4)},
+      ],
+      bitacora:[bit(addDays(T,-11),'Se registró acuerdo: se tiene por contestada la demanda','Lic. Mariana Ruiz'), bit(addDays(T,-8),'Aprobado el escrito de ofrecimiento de pruebas','Abraham Jassen'), bit(addDays(T,-4),'Se presentó ofrecimiento de pruebas, se adjuntó acuse','Lic. Mariana Ruiz'), bit(T,'Se registró acuerdo: se admite prueba pericial','Diego Mora')],
+      documentos:[{id:uid(),nombre:'01 Demanda inicial',fecha:'2025-03-12',quien:'Lic. Mariana Ruiz'},{id:uid(),nombre:'02 Auto admisorio',fecha:'2025-03-20',quien:'Diego Mora'},{id:uid(),nombre:'03 Emplazamiento',fecha:'2025-04-08',quien:'Diego Mora'},{id:uid(),nombre:'04 Contestación de demanda',fecha:'2025-04-28',quien:'Diego Mora'},{id:uid(),nombre:'05 Ofrecimiento de pruebas',fecha:addDays(T,-4),quien:'Lic. Mariana Ruiz'}]},
+    {id:'e2', numero:'87/2026', anio:'2026', juzgado:'Juzgado 4° Familiar, Querétaro', materia:'Familiar', tipo:'Divorcio', cliente:'Rodrigo Hernández', contraparte:'Laura Peña', caracter:'Actor', responsable:'Lic. Yairsinio García', etapa:'Audiencia preliminar', audiencia:addDays(T,13), estado:'activo', cuantia:'', esperandoAuto:false,
+      acciones:[{id:uid(), titulo:'Preparar audiencia preliminar', tipo:'Audiencia', responsable:'Lic. Yairsinio García', plazo:addDays(T,13), revisa:'', aprueba:'Abraham Jassen', estado:'pendiente', notas:''}],
+      bitacora:[bit(T,'Se registró acuerdo: se señala fecha de audiencia','Diego Mora')], documentos:[{id:uid(),nombre:'01 Demanda de divorcio',fecha:'2026-02-10',quien:'Lic. Yairsinio García'}]},
+    {id:'e3', numero:'201/2024', anio:'2024', juzgado:'Juzgado 1° Civil, Querétaro', materia:'Civil', tipo:'Ordinario civil', cliente:'Inmobiliaria Norte, S.A. de C.V.', contraparte:'Sucesión de Pedro Álvarez', caracter:'Actor', responsable:'Abraham Jassen', etapa:'Emplazamiento', audiencia:'', estado:'activo', cuantia:2100000, esperandoAuto:false,
+      acciones:[{id:uid(), titulo:'Promoción para impulsar emplazamiento por edictos', tipo:'Promoción', responsable:'Diego Mora', plazo:addDays(T,8), revisa:'Lic. Mariana Ruiz', aprueba:'Abraham Jassen', estado:'pendiente', notas:'Riesgo de caducidad'}],
+      bitacora:[bit(addDays(T,-95),'Se solicitó búsqueda de domicilio del demandado','Diego Mora')], documentos:[{id:uid(),nombre:'01 Demanda',fecha:'2024-06-03',quien:'Abraham Jassen'}]},
+    {id:'e4', numero:'95/2026', anio:'2026', juzgado:'Juzgado 3° Civil, Querétaro', materia:'Mercantil', tipo:'Ejecutivo mercantil', cliente:'Transportes Vega, S. de R.L.', contraparte:'Comercializadora Lima, S.A.', caracter:'Demandado', responsable:'Lic. Mariana Ruiz', etapa:'Contestación', audiencia:'', estado:'activo', cuantia:780000, esperandoAuto:false,
+      acciones:[{id:uid(), titulo:'Contestación de demanda', tipo:'Escrito', responsable:'Lic. Mariana Ruiz', plazo:addDays(T,1), revisa:'Lic. Yairsinio García', aprueba:'Abraham Jassen', estado:'aprobada', notas:''}],
+      bitacora:[bit(addDays(T,-6),'Se recibió emplazamiento','Diego Mora')], documentos:[]},
+    {id:'e5', numero:'140/2026', anio:'2026', juzgado:'Juzgado 1° Civil, Querétaro', materia:'Mercantil', tipo:'Oral mercantil', cliente:'Transportes Vega, S. de R.L.', contraparte:'Logística del Centro, S.A.', caracter:'Actor', responsable:'Lic. Mariana Ruiz', etapa:'Contestación', audiencia:'', estado:'activo', cuantia:350000, esperandoAuto:true,
+      acciones:[], bitacora:[bit(addDays(T,-5),'Se presentó promoción solicitando se tenga por contestada en sentido negativo','Lic. Mariana Ruiz')], documentos:[]},
+    {id:'e6', numero:'63/2025', anio:'2025', juzgado:'Juzgado de Control, Querétaro', materia:'Penal', tipo:'Carpeta de investigación', cliente:'Jorge Ramírez', contraparte:'Ministerio Público', caracter:'Imputado', responsable:'Lic. Yairsinio García', etapa:'Presentación de demanda', audiencia:'', estado:'activo', cuantia:'', esperandoAuto:false,
+      acciones:[], bitacora:[bit(addDays(T,-66),'Se solicitó copia de la carpeta','Lic. Yairsinio García')], documentos:[]},
+    {id:'e7', numero:'271/2024', anio:'2024', juzgado:'Juzgado 2° Civil, Querétaro', materia:'Mercantil', tipo:'Oral mercantil', cliente:'Grupo Sierra, S.A. de C.V.', contraparte:'Aceros Unidos, S.A.', caracter:'Actor', responsable:'Abraham Jassen', etapa:'Citado a sentencia', audiencia:'', estado:'sentencia', cuantia:1900000, esperandoAuto:false,
+      acciones:[], bitacora:[bit(addDays(T,-50),'Se presentaron alegatos','Abraham Jassen')], documentos:[]},
+    {id:'e8', numero:'188/2023', anio:'2023', juzgado:'Juzgado 3° Civil, Querétaro', materia:'Mercantil', tipo:'Ejecutivo mercantil', cliente:'Grupo Sierra, S.A. de C.V.', contraparte:'Distribuidora Ochoa', caracter:'Actor', responsable:'Abraham Jassen', etapa:'Ejecución', audiencia:'', estado:'terminado', cuantia:420000, esperandoAuto:false,
+      acciones:[], bitacora:[bit(addDays(T,-120),'Sentencia favorable, se cobró el adeudo','Abraham Jassen')], documentos:[]},
+  ];
+  const acuerdos = [
+    {id:uid(), fecha:T, expedienteId:'e1', sintesis:'Se admite prueba pericial en ingeniería', accion:'Designar perito', plazo:addDays(T,3), registradoPor:'Diego Mora'},
+    {id:uid(), fecha:T, expedienteId:'e2', sintesis:'Se señala audiencia preliminar', accion:'Preparar audiencia', plazo:addDays(T,13), registradoPor:'Diego Mora'},
+    {id:uid(), fecha:T, expedienteId:'e5', sintesis:'Se tiene por presentada la promoción, a sus autos', accion:'Solo registrar', plazo:'', registradoPor:'Diego Mora'},
+    {id:uid(), fecha:addDays(T,-1), expedienteId:'e4', sintesis:'Se tiene por emplazado, corre término para contestar', accion:'Contestar demanda', plazo:addDays(T,1), registradoPor:'Diego Mora'},
+  ];
+  const clientes = [
+    {id:'c1', razon:'Constructora del Bajío, S.A. de C.V.', rfc:'', representante:'Jorge Medina Ortiz', contacto:'Ana Torres, administración · 442 555 0300', servicio:'Iguala mensual', responsable:'Lic. Mariana Ruiz', desde:'2021',
+      documentos:[{id:uid(),carpeta:CARPETAS[0],nombre:'Escritura constitutiva 4,512',fecha:'2019-05-20'},{id:uid(),carpeta:CARPETAS[1],nombre:'Acta de asamblea ordinaria abril 2026',fecha:'2026-04-30'},{id:uid(),carpeta:CARPETAS[2],nombre:'Poder general J. Medina',fecha:'2021-11-15'},{id:uid(),carpeta:CARPETAS[3],nombre:'Constancia de situación fiscal 2026',fecha:'2026-01-10'}],
+      contratos:[{id:uid(),nombre:'Arrendamiento de nave industrial',contraparte:'Parques del Marqués, S.A.',objeto:'Nave 1, 2,400 m²',inicio:'2024-03-01',vencimiento:'2027-03-01',renovacion:'Automática anual',firmado:true},{id:uid(),nombre:'Suministro de concreto',contraparte:'Concretos QRO',objeto:'Suministro para obra Nave 2',inicio:'2025-12-01',vencimiento:addDays(T,68),renovacion:'Por convenio',firmado:true},{id:uid(),nombre:'Crédito simple bancario',contraparte:'Banco del Centro',objeto:'Crédito con garantía hipotecaria',inicio:'2024-06-15',vencimiento:'2029-06-15',renovacion:'No aplica',firmado:true},{id:uid(),nombre:'Prestación de servicios contables',contraparte:'Despacho Contable RM',objeto:'Contabilidad y nómina',inicio:'2026-01-01',vencimiento:'2026-12-31',renovacion:'Automática anual',firmado:false}],
+      porCelebrar:[{id:uid(),nombre:'Contrato de obra con subcontratista',elabora:'Lic. Mariana Ruiz',revisa:'Lic. Yairsinio García',aprueba:'Abraham Jassen',estado:'elaboracion',notas:'Obra civil Nave 2'},{id:uid(),nombre:'Convenio de confidencialidad con inversionista',elabora:'Lic. Mariana Ruiz',revisa:'Lic. Yairsinio García',aprueba:'Abraham Jassen',estado:'revision',notas:''},{id:uid(),nombre:'Renovación de poder a J. Medina',elabora:'Notaría 12',revisa:'Lic. Yairsinio García',aprueba:'Abraham Jassen',estado:'aprobado',notas:'Firma ante notario'}],
+      poderes:[{id:uid(),apoderado:'Jorge Medina Ortiz',facultades:'Pleitos y cobranzas, actos de administración',notaria:'Notaría 12, Querétaro',fecha:'2021-11-15',vigencia:addDays(T,53),inscrito:true,revocado:false},{id:uid(),apoderado:'Ana Torres',facultades:'Actos de administración (limitado)',notaria:'Notaría 12, Querétaro',fecha:'2023-02-01',vigencia:'',inscrito:true,revocado:false},{id:uid(),apoderado:'Luis Cárdenas (exdirector)',facultades:'Pleitos y cobranzas',notaria:'Notaría 5, Querétaro',fecha:'2019-06-01',vigencia:'',inscrito:false,revocado:true}],
+      contingencias:[{id:uid(),hecho:'Adeudo de proveedor Aceros del Norte por $380,000',riesgo:'alto',accion:'Enviar carta de requerimiento de pago',responsable:'Lic. Mariana Ruiz',fecha:addDays(T,7),estado:'abierta'},{id:uid(),hecho:'Posible reclamo laboral de exgerente de obra',riesgo:'medio',accion:'Revisar finiquito y renuncia firmados',responsable:'Lic. Yairsinio García',fecha:addDays(T,14),estado:'abierta'}],
+      cumplimiento:[{id:uid(),item:'Asamblea ordinaria anual 2026',fecha:'2026-04-30',estado:'cumplido'},{id:uid(),item:'Aviso de beneficiario controlador',fecha:addDays(T,40),estado:'pendiente'},{id:uid(),item:'Inscripción de revocación de poder de L. Cárdenas en RPC',fecha:addDays(T,20),estado:'pendiente'}],
+      dd:{ultimo:'2026-07-15', proximo:'2027-01-15', hallazgos:5, abiertos:2},
+      bitacora:[bit(addDays(T,-1),'Se envió borrador del convenio de confidencialidad','Lic. Mariana Ruiz'), bit(addDays(T,-5),'Reunión con J. Medina: se acordó renovar poder','Abraham Jassen')]},
+    {id:'c2', razon:'Grupo Sierra, S.A. de C.V.', rfc:'', representante:'Elena Sierra', contacto:'elena@gruposierra.mx', servicio:'Iguala mensual', responsable:'Abraham Jassen', desde:'2022',
+      documentos:[], contratos:[{id:uid(),nombre:'Suministro de acero',contraparte:'Aceros Unidos',objeto:'Suministro mensual',inicio:'2025-10-01',vencimiento:addDays(T,7),renovacion:'Por convenio',firmado:true}],
+      porCelebrar:[{id:uid(),nombre:'Contrato de distribución',elabora:'Lic. Mariana Ruiz',revisa:'Lic. Yairsinio García',aprueba:'Abraham Jassen',estado:'elaboracion',notas:''}],
+      poderes:[{id:uid(),apoderado:'Elena Sierra',facultades:'Poder general amplísimo',notaria:'Notaría 8, Querétaro',fecha:'2022-03-10',vigencia:'',inscrito:true,revocado:false}],
+      contingencias:[], cumplimiento:[{id:uid(),item:'Asamblea ordinaria anual 2026',fecha:'2026-04-28',estado:'cumplido'}], dd:{ultimo:'2026-07-20', proximo:'2027-01-20', hallazgos:2, abiertos:1}, bitacora:[]},
+    {id:'c3', razon:'Transportes Vega, S. de R.L. de C.V.', rfc:'', representante:'Carlos Vega', contacto:'carlos@tvega.mx · 442 555 0400', servicio:'Iguala mensual', responsable:'Lic. Yairsinio García', desde:'2024',
+      documentos:[], contratos:[], porCelebrar:[], poderes:[],
+      contingencias:[{id:uid(),hecho:'Reclamo de cliente por mercancía dañada en tránsito',riesgo:'medio',accion:'Revisar carta porte y póliza de seguro',responsable:'Lic. Yairsinio García',fecha:addDays(T,5),estado:'abierta'}],
+      cumplimiento:[{id:uid(),item:'Asamblea ordinaria anual 2026',fecha:'2026-04-30',estado:'vencido'}], dd:{ultimo:'2026-07-22', proximo:'2027-01-22', hallazgos:4, abiertos:3}, bitacora:[]},
+    {id:'c4', razon:'Hotel Las Palmas, S.A. de C.V.', rfc:'', representante:'Mónica Salas', contacto:'msalas@laspalmas.mx', servicio:'Por proyecto', responsable:'Lic. Mariana Ruiz', desde:'2026',
+      documentos:[], contratos:[], porCelebrar:[{id:uid(),nombre:'Arrendamiento de local comercial',elabora:'Lic. Mariana Ruiz',revisa:'Lic. Yairsinio García',aprueba:'Abraham Jassen',estado:'aprobacion',notas:''}], poderes:[], contingencias:[], cumplimiento:[], dd:{ultimo:'', proximo:'', hallazgos:0, abiertos:0}, bitacora:[]},
+  ];
+  const tramites = [
+    {id:'t1', clienteId:'c1', tipo:'Licencia de construcción', descripcion:'Nave 2, Parque industrial El Marqués', dependencia:'Desarrollo Urbano, Municipio de El Marqués', responsable:'Lic. Mariana Ruiz', fechaMeta:addDays(T,10), plazoRespuesta:'15 días hábiles', derechos:48500, etapa:'documentacion',
+      documentos:[{id:uid(),nombre:'Escritura de propiedad y libertad de gravamen',entrega:'Cliente',fecha:addDays(T,-13),estado:'recibido',bloquea:false},{id:uid(),nombre:'Dictamen de uso de suelo',entrega:'Despacho',fecha:addDays(T,-1),estado:'recibido',bloquea:false},{id:uid(),nombre:'Alineamiento y número oficial',entrega:'Rubén Soto (gestor)',fecha:addDays(T,-8),estado:'recibido',bloquea:false},{id:uid(),nombre:'Identificación y poder del representante',entrega:'Cliente',fecha:addDays(T,-13),estado:'recibido',bloquea:false},{id:uid(),nombre:'Proyecto arquitectónico y memoria de cálculo',entrega:'Ing. Carlos Vega (DRO)',fecha:addDays(T,6),estado:'pendiente',bloquea:false},{id:uid(),nombre:'Visto bueno de Protección Civil',entrega:'Despacho · trámite previo',fecha:addDays(T,8),estado:'pendiente',bloquea:true},{id:uid(),nombre:'Comprobante de pago de derechos',entrega:'Cliente',fecha:'',estado:'pendiente',bloquea:false}],
+      coadyuvantes:[{id:uid(),nombre:'Ing. Carlos Vega',funcion:'Director responsable de obra',contacto:'442 555 0100'},{id:uid(),nombre:'Arq. Laura Méndez',funcion:'Proyecto arquitectónico',contacto:'laura@estudio.mx'},{id:uid(),nombre:'Rubén Soto',funcion:'Gestor ante el municipio',contacto:'442 555 0200'}],
+      bitacora:[bit(addDays(T,-1),'Se recibió dictamen de uso de suelo','Lic. Mariana Ruiz'), bit(addDays(T,-5),'Reunión con DRO: entrega del proyecto en una semana','Abraham Jassen')]},
+    {id:'t2', clienteId:'c1', tipo:'Visto bueno de Protección Civil', descripcion:'Nave 2, trámite previo a la licencia', dependencia:'Protección Civil, El Marqués', responsable:'Diego Mora', fechaMeta:addDays(T,-3), plazoRespuesta:'10 días hábiles', derechos:6200, etapa:'prevencion',
+      documentos:[{id:uid(),nombre:'Programa interno de protección civil',entrega:'Consultor externo',fecha:addDays(T,-10),estado:'recibido',bloquea:false},{id:uid(),nombre:'Dictamen estructural',entrega:'Ing. Carlos Vega (DRO)',fecha:addDays(T,2),estado:'pendiente',bloquea:true}],
+      coadyuvantes:[{id:uid(),nombre:'Ing. Carlos Vega',funcion:'Director responsable de obra',contacto:'442 555 0100'}], bitacora:[bit(addDays(T,-3),'La dependencia previno: falta dictamen estructural','Diego Mora')]},
+    {id:'t3', clienteId:'c2', tipo:'Registro de marca (IMPI)', descripcion:'Marca "Sierra Acero" clase 6', dependencia:'IMPI', responsable:'Lic. Mariana Ruiz', fechaMeta:addDays(T,-20), plazoRespuesta:'4 a 6 meses', derechos:3100, etapa:'resolucion',
+      documentos:[{id:uid(),nombre:'Solicitud de registro',entrega:'Despacho',fecha:addDays(T,-20),estado:'recibido',bloquea:false}], coadyuvantes:[], bitacora:[bit(addDays(T,-20),'Se ingresó la solicitud en línea','Lic. Mariana Ruiz')]},
+  ];
+  return {usuarios, expedientes, acuerdos, clientes, tramites};
+}
+function cargarEjemplo(){ const d=seed(); KINDS.forEach(k=>{ S[k]=d[k]; }); lsSave(); if(db) KINDS.forEach(k=>S[k].forEach(o=>dbWrite(k,o))); toast('Datos de ejemplo cargados'); render(); }
+function borrarTodo(){ if(db){ KINDS.forEach(k=>S[k].forEach(o=>dbDelete(k,o.id))); } KINDS.forEach(k=>S[k]=[]); lsSave(); toast('Datos borrados'); render(); }
+/* ---------- modal y formularios ---------- */
+function closeModal(){ $('#modal').innerHTML=''; }
+function openModal(html){ $('#modal').innerHTML=`<div class="ov" id="ov"><div class="md" role="dialog" aria-modal="true">${html}</div></div>`; $('#ov').addEventListener('click',e=>{ if(e.target.id==='ov') closeModal(); }); const first=$('#modal').querySelector('input,select,textarea'); if(first) first.focus(); }
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
+// fields: {k,label,type,options,value,required,hint,half}
+function formModal(title, fields, onSubmit, opts={}){
+  const inp = f => {
+    const v = f.value ?? '';
+    if(f.type==='select') return `<select name="${f.k}" ${f.required?'required':''}>${(f.options||[]).map(o=>{ const [val,lab]=Array.isArray(o)?o:[o,o]; return `<option value="${esc(val)}" ${val===v?'selected':''}>${esc(lab)}</option>`; }).join('')}</select>`;
+    if(f.type==='textarea') return `<textarea name="${f.k}">${esc(v)}</textarea>`;
+    if(f.type==='checkbox') return `<input type="checkbox" name="${f.k}" ${v?'checked':''}>`;
+    return `<input type="${f.type||'text'}" name="${f.k}" value="${esc(v)}" ${f.required?'required':''} ${f.placeholder?`placeholder="${esc(f.placeholder)}"`:''}>`;
+  };
+  const fh = f => f.type==='checkbox' ? `<div class="f inline">${inp(f)}<label style="margin:0">${esc(f.label)}</label></div>` : `<div class="f"><label>${esc(f.label)}${f.required?' *':''}</label>${inp(f)}${f.hint?`<div class="hint">${f.hint}</div>`:''}</div>`;
+  let html = `<h2>${esc(title)}</h2><form id="mf">`;
+  let i=0; while(i<fields.length){ const f=fields[i]; if(f.half && fields[i+1] && fields[i+1].half){ html+=`<div class="f2">${fh(f)}${fh(fields[i+1])}</div>`; i+=2; } else { html+=fh(f); i++; } }
+  html += `<div class="err" id="ferr"></div><div class="macts">${opts.extra||''}<button type="button" class="btn" id="fcancel">Cancelar</button><button type="submit" class="btn p">${esc(opts.submit||'Guardar')}</button></div></form>`;
+  openModal(html);
+  $('#fcancel').onclick = closeModal;
+  if(opts.after) opts.after();
+  $('#mf').onsubmit = e => {
+    e.preventDefault();
+    const fd = new FormData(e.target); const vals={};
+    fields.forEach(f=>{ vals[f.k] = f.type==='checkbox' ? fd.get(f.k)==='on' : (fd.get(f.k)??'').toString().trim(); });
+    const miss = fields.filter(f=>f.required && !vals[f.k]);
+    if(miss.length){ $('#ferr').textContent='Falta: '+miss.map(f=>f.label).join(', '); return; }
+    const err = onSubmit(vals); if(err){ $('#ferr').textContent=err; return; }
+    closeModal();
+  };
+}
+function confirmModal(msg, onOk, label='Eliminar'){ openModal(`<h2>Confirmar</h2><p style="font-size:13.5px">${esc(msg)}</p><div class="macts"><button class="btn" id="cno">Cancelar</button><button class="btn danger" id="cyes">${esc(label)}</button></div>`); $('#cno').onclick=closeModal; $('#cyes').onclick=()=>{ closeModal(); onOk(); }; }
+function textModal(title, text, hint){ openModal(`<h2>${esc(title)}</h2>${hint?`<div class="note">${hint}</div>`:''}<div class="f"><textarea id="tm" style="min-height:260px;font-size:12.5px">${esc(text)}</textarea></div><div class="macts"><button class="btn" id="tclose">Cerrar</button><button class="btn p" id="tcopy">Copiar texto</button></div>`); $('#tclose').onclick=closeModal; $('#tcopy').onclick=async()=>{ try{ await navigator.clipboard.writeText($('#tm').value); toast('Copiado'); }catch(e){ $('#tm').select(); document.execCommand('copy'); toast('Copiado'); } }; }
+function userOpts(blank){ const o=S.usuarios.map(u=>[u.nombre,u.nombre]); return blank?[['','— Sin asignar —'],...o]:o; }
+
+/* ---------- derivados de expedientes ---------- */
+const exp = id => S.expedientes.find(e=>e.id===id);
+const cli = id => S.clientes.find(c=>c.id===id);
+const tra = id => S.tramites.find(t=>t.id===id);
+function pendientes(e){ return (e.acciones||[]).filter(a=>a.estado!=='terminada'); }
+function ultima(e){ const b=[...(e.bitacora||[])].sort(byDateDesc); return b[0]||null; }
+function proximoPlazo(e){ const p=pendientes(e).filter(a=>a.plazo).sort((a,b)=>a.plazo.localeCompare(b.plazo)); return p[0]||null; }
+function diasSin(e){ const u=ultima(e); return u?daysSince(u.fecha):null; }
+function urgencia(e){ // devuelve {cls, txt} o null
+  const p=proximoPlazo(e); const n=p?daysUntil(p.plazo):null; const ds=diasSin(e);
+  if(n!=null && n<=3) return {cls:'red', txt:n<0?'Plazo vencido':n===0?'Vence hoy':n===1?'Vence mañana':`Vence en ${n} días`, orden:n};
+  if(ds!=null && ds>60) return {cls:'red', txt:`${ds} días sin actuación`, orden:-1};
+  if(n!=null && n<=7) return {cls:'amb', txt:`Vence en ${n} días`, orden:n};
+  if(ds!=null && ds>30) return {cls:'amb', txt:`${ds} días sin actuación`, orden:50};
+  return null;
+}
+function expTitle(e){ return `${e.numero} · ${e.tipo||e.materia}`; }
+function expRow(e, right){ const r = right ?? (urgencia(e)?`<span class="chip ${urgencia(e).cls}">${urgencia(e).txt}</span>`:`<span class="chip ${e.estado==='terminado'?'grn':e.estado==='sentencia'?'gry':'blu'}">${e.estado==='terminado'?'Terminado':e.estado==='sentencia'?'Sentencia':'Activo'}</span>`); return `<div class="row click" onclick="go('#/expediente/${e.id}')"><div><b>${esc(expTitle(e))}</b><div class="m">Cliente: ${esc(e.cliente)} · ${esc(e.responsable||'')}</div></div><div class="r">${r}</div></div>`; }
+
+/* ---------- router y render ---------- */
+let sideOpen=false, filtroMateria='Todos', filtroCli='Todos';
+function route(){ const h=(location.hash||'#/litigios').slice(2).split('/'); return {p:h[0]||'litigios', id:h[1]||'', sub:h[2]||''}; }
+function render(){ renderSide(); const r=route(); const v=VIEWS[r.p]||VIEWS.litigios; $('#main').innerHTML = v(r); window.scrollTo(0,0); sideOpen=false; $('#side').classList.remove('open'); }
+window.addEventListener('hashchange', render);
+function renderSide(){
+  const r=route(); const lit=['litigios','expedientes','expediente','acuerdos'].includes(r.p); const cor=['corporativo','clientes','cliente','tramites','tramite'].includes(r.p);
+  const on=p=>r.p===p?'on':'';
+  $('#side').innerHTML = `<div class="brand">Despacho<small>Prototipo de gestión jurídica</small></div>
+  <a class="nav ${lit?'on':''}" href="#/litigios">Litigios</a>
+  ${lit?`<a class="sub ${on('litigios')}" href="#/litigios">Tablero del día</a><a class="sub ${on('expedientes')||on('expediente')}" href="#/expedientes">Expedientes</a><a class="sub ${on('acuerdos')}" href="#/acuerdos">Acuerdos publicados</a>`:''}
+  <a class="nav ${cor?'on':''}" href="#/corporativo">Servicios corporativos</a>
+  ${cor?`<a class="sub ${on('corporativo')}" href="#/corporativo">Tablero</a><a class="sub ${on('clientes')||on('cliente')}" href="#/clientes">Clientes</a><a class="sub ${on('tramites')||on('tramite')}" href="#/tramites">Trámites</a>`:''}
+  <a class="nav ${on('calendario')}" href="#/calendario">Calendario</a>
+  <a class="nav ${on('equipo')}" href="#/equipo">Equipo y tareas</a>
+  <div class="navsec">Administración</div>
+  <a class="nav ${on('config')}" href="#/config">Configuración</a>
+  <div class="yo">Estoy trabajando como<select id="yoSel">${S.usuarios.map(u=>`<option ${u.nombre===quien()?'selected':''}>${esc(u.nombre)}</option>`).join('')||'<option>Sin usuarios</option>'}</select>
+  <div class="sync">${db?(dbReady?'Datos compartidos con el equipo':'Conectando con el equipo…'):'Datos guardados en este navegador'}</div></div>`;
+  $('#yoSel').onchange=e=>{ setYo(e.target.value); toast('Ahora trabajas como '+e.target.value); };
+}
+$('#tbMenu').onclick=()=>{ sideOpen=!sideOpen; $('#side').classList.toggle('open',sideOpen); };
+function head(title, sub, crumb, acts){ return `${crumb?`<div class="crumb">${crumb}</div>`:''}<div class="h"><h1>${esc(title)}${sub?`<span>${esc(sub)}</span>`:''}</h1><div class="hdr-acts" style="display:flex;gap:6px;flex-wrap:wrap">${acts||''}</div></div>`; }
+function welcome(){ if(S.expedientes.length||S.clientes.length||S.usuarios.length) return ''; return `<div class="welcome"><b>Todavía no hay datos</b>Puedes cargar un juego de datos de ejemplo para recorrer el prototipo, o empezar desde cero dando de alta a tu equipo en Configuración.<br><button class="btn p" onclick="cargarEjemplo()">Cargar datos de ejemplo</button><button class="btn" onclick="go('#/config')">Ir a configuración</button></div>`; }
+
+/* ---------- LITIGIOS: tablero ---------- */
+const VIEWS = {};
+VIEWS.litigios = () => {
+  const T=todayISO(); const act=S.expedientes.filter(e=>e.estado==='activo');
+  const hoy=S.acuerdos.filter(a=>a.fecha===T).map(a=>({a, e:exp(a.expedienteId)})).filter(x=>x.e);
+  const urg=act.map(e=>({e,u:urgencia(e)})).filter(x=>x.u).sort((a,b)=>a.u.orden-b.u.orden);
+  const esperando=act.filter(e=>e.esperandoAuto);
+  const porActuar=act.filter(e=>!e.esperandoAuto && pendientes(e).length && !urgencia(e));
+  const sent=S.expedientes.filter(e=>e.estado==='sentencia'); const term=S.expedientes.filter(e=>e.estado==='terminado');
+  return head('Litigios', fmtLong(T), '', `<button class="btn p" onclick="nuevoExpediente()">+ Nuevo expediente</button>`) + welcome() + `
+  <div class="metrics">
+    <div class="metric" onclick="go('#/expedientes')"><div class="l">Expedientes activos</div><div class="v">${act.length}</div></div>
+    <div class="metric" onclick="go('#/expedientes/urgentes')"><div class="l">Por vencer o sin impulso</div><div class="v" style="color:${urg.length?'var(--red-t)':'inherit'}">${urg.length}</div></div>
+    <div class="metric" onclick="go('#/expedientes/sentencia')"><div class="l">En espera de sentencia</div><div class="v">${sent.length}</div></div>
+    <div class="metric" onclick="go('#/expedientes/terminados')"><div class="l">Terminados</div><div class="v">${term.length}</div></div>
+  </div>
+  <div class="legend"><span><i class="dot" style="background:var(--red)"></i>Vence en 3 días o menos, o más de 60 días sin actuación</span><span><i class="dot" style="background:var(--amb)"></i>Vence esta semana, o más de 30 días sin actuación</span><span><i class="dot" style="background:var(--gry)"></i>En espera del juzgado</span></div>
+  <div class="cols c3">
+    <div>
+      <div class="card"><h3>Acuerdos publicados hoy<span class="lnk" onclick="registrarAcuerdo()">+ Registrar</span></h3>
+        ${hoy.length?hoy.map(({a,e})=>`<div class="row click" onclick="go('#/expediente/${e.id}')"><div><b>${esc(expTitle(e))}</b><div class="m">${esc(e.juzgado)} · ${esc(a.sintesis)}</div></div><div class="r">${a.accion?`<span class="chip ${a.accion==='Solo registrar'?'gry':a.plazo&&daysUntil(a.plazo)<=3?'amb':'blu'}">${esc(a.accion)}${a.plazo?' · '+fmt(a.plazo):''}</span>`:''}</div></div>`).join(''):'<div class="empty">Nada registrado hoy. Captura lo que salió en la lista de acuerdos.</div>'}
+        <div class="note"><a href="#/acuerdos">Ver acuerdos de otros días</a></div>
+      </div>
+      <div class="card"><h3>Por actuar o en espera de auto</h3>
+        ${esperando.map(e=>expRow(e,`<span class="chip gry">Esperando auto</span>`)).join('')}
+        ${porActuar.map(e=>{ const p=proximoPlazo(e); return expRow(e,`<span class="chip blu">${p?esc(p.titulo.slice(0,28)):'Actuar'}</span>`); }).join('')}
+        ${!esperando.length&&!porActuar.length?'<div class="empty">Nada pendiente fuera de lo urgente.</div>':''}
+      </div>
+    </div>
+    <div>
+      <div class="card"><h3>Por vencer o sin impulso procesal<a href="#/expedientes/urgentes">Ver todos</a></h3>
+        ${urg.length?urg.slice(0,8).map(({e,u})=>{ const p=proximoPlazo(e); return `<div class="row click" onclick="go('#/expediente/${e.id}')"><div><b>${esc(expTitle(e))}</b><div class="m">${p?esc(p.titulo)+' · '+esc(p.responsable||''):'Sin acciones registradas'}</div></div><div class="r"><span class="chip ${u.cls}">${u.txt}</span></div></div>`; }).join(''):'<div class="empty">Nada por vencer. Buen día.</div>'}
+      </div>
+      <div class="card"><h3>En espera de sentencia<a href="#/expedientes/sentencia">Ver los ${sent.length}</a></h3>${sent.slice(0,4).map(e=>expRow(e,`<span class="chip gry">${esc(e.etapa)}</span>`)).join('')||'<div class="empty">Ninguno.</div>'}</div>
+      <div class="card"><h3>Terminados<a href="#/expedientes/terminados">Ver los ${term.length}</a></h3>${term.slice(0,3).map(e=>expRow(e,`<span class="chip grn">Cerrado</span>`)).join('')||'<div class="empty">Ninguno.</div>'}</div>
+    </div>
+    <div>${expedientesCard(act, true)}</div>
+  </div>`;
+};
+function expedientesCard(list, compact){
+  const mats=['Todos',...MATERIAS.filter(m=>S.expedientes.some(e=>e.materia===m))];
+  const l=list.filter(e=>filtroMateria==='Todos'||e.materia===filtroMateria);
+  return `<div class="card"><h3>Expedientes<span class="lnk" onclick="nuevoExpediente()">+ Nuevo</span></h3>
+  <div class="filters">${mats.map(m=>`<span class="${filtroMateria===m?'on':''}" onclick="filtroMateria='${m}';render()">${m}</span>`).join('')}</div>
+  ${l.length?l.map(e=>expRow(e)).join(''):'<div class="empty">Sin expedientes en este filtro.</div>'}</div>`;
+}
+VIEWS.expedientes = r => {
+  let list=S.expedientes, title='Expedientes', sub='';
+  if(r.id==='urgentes'){ list=S.expedientes.filter(e=>e.estado==='activo'&&urgencia(e)); title='Por vencer o sin impulso'; }
+  else if(r.id==='sentencia'){ list=S.expedientes.filter(e=>e.estado==='sentencia'); title='En espera de sentencia'; }
+  else if(r.id==='terminados'){ list=S.expedientes.filter(e=>e.estado==='terminado'); title='Expedientes terminados'; }
+  else sub=`${list.length} en total`;
+  return head(title, sub, '<a href="#/litigios">Litigios</a> · Expedientes', `<button class="btn p" onclick="nuevoExpediente()">+ Nuevo expediente</button>`) + expedientesCard(list);
+};
+
+/* ---------- LITIGIOS: ficha ---------- */
+VIEWS.expediente = r => {
+  const e=exp(r.id); if(!e) return head('Expediente no encontrado','','<a href="#/expedientes">Expedientes</a>');
+  const u=ultima(e); const urg=urgencia(e);
+  const acc=[...(e.acciones||[])].sort((a,b)=>(a.estado==='terminada')-(b.estado==='terminada')||(a.plazo||'9').localeCompare(b.plazo||'9'));
+  const estadoChip = e.estado==='terminado'?'<span class="chip grn">Terminado</span>':e.estado==='sentencia'?'<span class="chip gry">En espera de sentencia</span>':'<span class="chip blu">Activo</span>';
+  return head(`Expediente ${e.numero}`, e.tipo, `<a href="#/litigios">Litigios</a> · <a href="#/expedientes">Expedientes</a> · ${esc(e.numero)}`) + `
+  <div class="hdr"><div class="top"><div><div class="t">${esc(e.cliente)} <span style="color:var(--t3);font-weight:400">vs</span> ${esc(e.contraparte||'—')}</div><div class="s">${esc(e.materia)} · ${esc(e.caracter||'')} · Abogado responsable: ${esc(e.responsable||'—')}</div></div>
+    <div class="acts">${estadoChip}${e.esperandoAuto?'<span class="chip gry">Esperando auto</span>':''}${urg?`<span class="chip ${urg.cls}">${urg.txt}</span>`:''}<button class="btn" onclick="editarExpediente('${e.id}')">Editar</button><button class="btn" onclick="informeExpediente('${e.id}')">Informe al cliente</button><button class="btn p" onclick="nuevaAccion('${e.id}')">+ Agregar acción</button></div></div>
+    <div class="grid">
+      <div><div class="l">Juzgado</div><div class="v">${esc(e.juzgado)}</div></div>
+      <div><div class="l">Año</div><div class="v">${esc(e.anio)}</div></div>
+      <div><div class="l">Etapa procesal</div><div class="v">${esc(e.etapa)} <span class="lnk" onclick="cambiarEtapa('${e.id}')">cambiar</span></div></div>
+      <div><div class="l">Próxima audiencia</div><div class="v">${e.audiencia?fmt(e.audiencia,true):'—'}</div></div>
+      <div><div class="l">Última actuación</div><div class="v">${u?fmt(u.fecha,true)+' · '+esc(u.texto):'Sin actuaciones'}</div></div>
+      <div><div class="l">Realizada por</div><div class="v">${u?esc(u.quien):'—'}</div></div>
+      <div><div class="l">Cuantía</div><div class="v">${money(e.cuantia)}</div></div>
+      <div><div class="l">Estado del expediente</div><div class="v"><span class="lnk" onclick="cambiarEstadoExp('${e.id}')">${e.estado==='activo'?'Activo · cambiar':e.estado==='sentencia'?'Citado a sentencia · cambiar':'Terminado · cambiar'}</span></div></div>
+    </div></div>
+  <div class="cols c21"><div>
+    <div class="card"><h3>Próximas acciones a realizar</h3>
+    <div class="tw"><table><tr><th style="min-width:180px">Documento, promoción o acto</th><th>Responsable</th><th>Plazo</th><th>Revisa</th><th>Aprueba</th><th>Estado</th><th></th></tr>
+    ${acc.map(a=>accionRow(e,a)).join('')||'<tr><td colspan="7" class="empty">Sin acciones. Agrega la primera.</td></tr>'}</table></div>
+    <div class="note">Flujo: pendiente → en elaboración → en revisión → aprobada → terminada. Solo se puede marcar terminada una acción aprobada (o sin revisor ni aprobador). Al terminar una promoción o escrito, el expediente queda en espera de auto hasta que registres el acuerdo.</div></div>
+    <div class="card"><h3>Bitácora del expediente<span class="lnk" onclick="nuevaBitacora('expedientes','${e.id}')">+ Anotar</span></h3>
+    ${[...(e.bitacora||[])].sort(byDateDesc).map(b=>`<div class="row"><div><b>${fmt(b.fecha,true)} · ${esc(b.texto)}</b><div class="m">${esc(b.quien)}</div></div></div>`).join('')||'<div class="empty">Sin registros.</div>'}</div>
+  </div><div>
+    <div class="card"><h3>Expediente digitalizado<span class="lnk" onclick="nuevoDocumento('${e.id}')">+ Registrar documento</span></h3>
+    ${[...(e.documentos||[])].sort((a,b)=>(a.fecha||'').localeCompare(b.fecha||'')).map((d,i)=>`<div class="row"><div><b>${esc(d.nombre)}</b><div class="m">${fmt(d.fecha,true)} · ${esc(d.quien||'')}</div></div><div class="r"><span class="lnk" onclick="quitarDocumento('${e.id}','${d.id}')">quitar</span></div></div>`).join('')||'<div class="empty">Aún no hay constancias registradas. En esta versión se registra el nombre y la fecha de cada documento; los archivos se guardan en el repositorio del despacho.</div>'}</div>
+    <div class="card"><h3>Datos de las partes</h3>
+      <div class="row"><div><b>${esc(e.caracter||'Cliente')}</b><div class="m">${esc(e.cliente)}</div></div></div>
+      <div class="row"><div><b>Contraparte</b><div class="m">${esc(e.contraparte||'—')}</div></div></div>
+      <div class="row"><div><b>Acuerdos registrados</b><div class="m">${S.acuerdos.filter(a=>a.expedienteId===e.id).sort(byDateDesc).map(a=>fmt(a.fecha)+': '+esc(a.sintesis)).join('<br>')||'Ninguno'}</div></div></div>
+    </div>
+  </div></div>`;
+};
+function accionRow(e,a){
+  const [lab,cls]=EST_ACC[a.estado]||EST_ACC.pendiente; const done=a.estado==='terminada';
+  const puedeTerminar = a.estado==='aprobada' || (!a.revisa && !a.aprueba && a.estado!=='pendiente');
+  const n=a.plazo?daysUntil(a.plazo):null; const plazoStyle = !done&&n!=null&&n<=3?'color:var(--red-t);font-weight:600':!done&&n!=null&&n<=7?'color:var(--amb-t);font-weight:600':'';
+  const next = FLUJO_ACC[FLUJO_ACC.indexOf(a.estado)+1];
+  const btn = done ? '' : puedeTerminar ? `<button class="btn sm p" onclick="terminarAccion('${e.id}','${a.id}')">Terminar</button>` : next && next!=='terminada' ? `<button class="btn sm" onclick="avanzarAccion('${e.id}','${a.id}')">${next==='elaboracion'?'Iniciar':next==='revision'?'A revisión':'Aprobar'}</button>` : '';
+  return `<tr class="${done?'done':''}"><td><b>${esc(a.titulo)}</b><br><span class="mini">${esc(a.tipo)}${a.notas?' · '+esc(a.notas):''}${a.acuse?' · '+esc(a.acuse):''}</span></td><td>${esc(a.responsable||'—')}</td><td style="${plazoStyle}">${a.plazo?fmt(a.plazo):'—'}</td><td>${esc(a.revisa||'—')}</td><td>${esc(a.aprueba||'—')}</td><td><span class="chip ${cls}">${lab}</span></td><td style="white-space:nowrap">${btn} <span class="lnk" onclick="editarAccion('${e.id}','${a.id}')">editar</span></td></tr>`;
+}
+
+/* ---------- LITIGIOS: acuerdos ---------- */
+VIEWS.acuerdos = () => {
+  const dias=[...new Set(S.acuerdos.map(a=>a.fecha))].sort().reverse();
+  return head('Acuerdos publicados','','<a href="#/litigios">Litigios</a> · Acuerdos', `<button class="btn p" onclick="registrarAcuerdo()">+ Registrar acuerdo</button>`) + (dias.length?dias.map(d=>`<div class="card"><h3>${fmtLong(d)}</h3>${S.acuerdos.filter(a=>a.fecha===d).map(a=>{ const e=exp(a.expedienteId); return `<div class="row ${e?'click':''}" onclick="${e?`go('#/expediente/${e.id}')`:''}"><div><b>${e?esc(expTitle(e)):'Expediente eliminado'}</b><div class="m">${esc(a.sintesis)} · registró ${esc(a.registradoPor||'')}</div></div><div class="r">${a.accion?`<span class="chip ${a.accion==='Solo registrar'?'gry':'blu'}">${esc(a.accion)}${a.plazo?' · '+fmt(a.plazo):''}</span>`:''}</div></div>`; }).join('')}</div>`).join(''):'<div class="card"><div class="empty">Sin acuerdos registrados.</div></div>');
+};
+/* ---------- LITIGIOS: acciones ---------- */
+function addBit(kind, obj, texto){ obj.bitacora=obj.bitacora||[]; obj.bitacora.push({id:uid(), fecha:todayISO(), texto, quien:quien()}); }
+const expFields = e => [
+  {k:'numero',label:'Número de expediente',required:true,value:e.numero,half:true,placeholder:'312/2025'},
+  {k:'anio',label:'Año',required:true,value:e.anio||new Date().getFullYear(),half:true},
+  {k:'juzgado',label:'Juzgado',required:true,value:e.juzgado,placeholder:'Juzgado 2° Civil, Querétaro'},
+  {k:'materia',label:'Materia',type:'select',options:MATERIAS,value:e.materia||'Mercantil',half:true},
+  {k:'tipo',label:'Tipo de asunto',value:e.tipo,half:true,placeholder:'Oral mercantil'},
+  {k:'cliente',label:'Cliente',required:true,value:e.cliente,half:true},
+  {k:'caracter',label:'Carácter del cliente',type:'select',options:['Actor','Demandado','Quejoso','Tercero interesado','Imputado','Víctima','Promovente'],value:e.caracter||'Actor',half:true},
+  {k:'contraparte',label:'Contraparte',value:e.contraparte},
+  {k:'responsable',label:'Abogado responsable',type:'select',options:userOpts(true),value:e.responsable||quien(),half:true},
+  {k:'etapa',label:'Etapa procesal',type:'select',options:ETAPAS,value:e.etapa||ETAPAS[0],half:true},
+  {k:'audiencia',label:'Próxima audiencia',type:'date',value:e.audiencia,half:true},
+  {k:'cuantia',label:'Cuantía (MXN)',type:'number',value:e.cuantia,half:true},
+];
+function nuevoExpediente(){ formModal('Nuevo expediente', expFields({}), v=>{ const e={id:uid(), ...v, estado:'activo', esperandoAuto:false, acciones:[], bitacora:[], documentos:[]}; addBit('expedientes',e,'Se dio de alta el expediente'); persist('expedientes',e); toast('Expediente creado'); go('#/expediente/'+e.id); }); }
+function editarExpediente(id){ const e=exp(id); formModal('Editar expediente', expFields(e), v=>{ Object.assign(e,v); persist('expedientes',e); render(); }, {extra:`<button type="button" class="btn danger" onclick="closeModal();confirmModal('¿Eliminar el expediente ${esc(e.numero)}? Esta acción no se puede deshacer.',()=>{removeItem('expedientes','${e.id}');go('#/expedientes');})">Eliminar</button>`}); }
+function cambiarEtapa(id){ const e=exp(id); formModal('Cambiar etapa procesal',[{k:'etapa',label:'Etapa',type:'select',options:ETAPAS,value:e.etapa}], v=>{ if(v.etapa!==e.etapa){ addBit('expedientes',e,`Cambió la etapa procesal a: ${v.etapa}`); e.etapa=v.etapa; if(v.etapa==='Citado a sentencia') e.estado='sentencia'; persist('expedientes',e); } render(); }); }
+function cambiarEstadoExp(id){ const e=exp(id); formModal('Estado del expediente',[{k:'estado',label:'Estado',type:'select',options:[['activo','Activo'],['sentencia','En espera de sentencia'],['terminado','Terminado']],value:e.estado},{k:'nota',label:'Nota (opcional)',placeholder:'Sentencia favorable, convenio, desistimiento…'}], v=>{ if(v.estado!==e.estado){ addBit('expedientes',e,`Estado: ${({activo:'activo',sentencia:'en espera de sentencia',terminado:'terminado'})[v.estado]}${v.nota?' · '+v.nota:''}`); e.estado=v.estado; persist('expedientes',e); } render(); }); }
+const accFields = a => [
+  {k:'titulo',label:'Documento, promoción o acto',required:true,value:a.titulo,placeholder:'Escrito de designación de perito'},
+  {k:'tipo',label:'Tipo',type:'select',options:TIPOS_ACCION,value:a.tipo||'Promoción',half:true},
+  {k:'plazo',label:'Fecha límite o plazo judicial',type:'date',value:a.plazo,half:true,hint:'<span class="lnk" onclick="calcPlazo()">Calcular a partir de días hábiles</span>'},
+  {k:'responsable',label:'Responsable (elabora)',type:'select',options:userOpts(true),value:a.responsable||quien(),half:true},
+  {k:'revisa',label:'Revisa',type:'select',options:userOpts(true),value:a.revisa||'',half:true},
+  {k:'aprueba',label:'Aprueba',type:'select',options:userOpts(true),value:a.aprueba||''},
+  {k:'notas',label:'Notas',type:'textarea',value:a.notas},
+];
+function calcPlazo(){ const f=$('#mf'); const n=prompt('¿Cuántos días hábiles? (se cuentan desde hoy, sin sábados ni domingos; ajusta manualmente si hay días inhábiles del tribunal)'); if(n&&Number(n)>0){ f.plazo.value=addBusinessDays(todayISO(),Number(n)); } }
+function nuevaAccion(id){ const e=exp(id); formModal('Nueva acción', accFields({}), v=>{ e.acciones=e.acciones||[]; e.acciones.push({id:uid(), ...v, estado:'pendiente'}); persist('expedientes',e); toast('Acción agregada'); render(); }); }
+function editarAccion(id,aid){ const e=exp(id); const a=e.acciones.find(x=>x.id===aid); formModal('Editar acción', [...accFields(a),{k:'estado',label:'Estado',type:'select',options:Object.entries(EST_ACC).map(([k,v])=>[k,v[0]]),value:a.estado}], v=>{ Object.assign(a,v); persist('expedientes',e); render(); }, {extra:`<button type="button" class="btn danger" onclick="closeModal();confirmModal('¿Eliminar esta acción?',()=>{const e=exp('${id}');e.acciones=e.acciones.filter(x=>x.id!=='${aid}');persist('expedientes',e);render();})">Eliminar</button>`}); }
+function avanzarAccion(id,aid){ const e=exp(id); const a=e.acciones.find(x=>x.id===aid); const next=FLUJO_ACC[FLUJO_ACC.indexOf(a.estado)+1]; if(!next||next==='terminada') return; if(next==='aprobada' && a.aprueba && a.aprueba!==quien()){ if(!confirm(`Esta acción la aprueba ${a.aprueba}. ¿Aprobar de todos modos como ${quien()}?`)) return; } a.estado=next; if(next==='aprobada') addBit('expedientes',e,`Aprobado: ${a.titulo}`); if(next==='revision') addBit('expedientes',e,`A revisión: ${a.titulo}`); persist('expedientes',e); render(); }
+function terminarAccion(id,aid){ const e=exp(id); const a=e.acciones.find(x=>x.id===aid);
+  formModal('Marcar como terminada',[{k:'acuse',label:'Acuse, folio o referencia',placeholder:'Acuse de recibo 23 sep, oficialía de partes'},{k:'fecha',label:'Fecha en que se realizó',type:'date',value:todayISO(),required:true},{k:'doc',label:'Registrar también como documento del expediente',type:'checkbox',value:['Promoción','Escrito'].includes(a.tipo)}], v=>{
+    a.estado='terminada'; a.acuse=v.acuse; a.terminadaEl=v.fecha;
+    e.bitacora=e.bitacora||[]; e.bitacora.push({id:uid(), fecha:v.fecha, texto:`${a.titulo}${v.acuse?' · '+v.acuse:''}`, quien:quien()});
+    if(v.doc){ e.documentos=e.documentos||[]; e.documentos.push({id:uid(), nombre:a.titulo, fecha:v.fecha, quien:quien()}); }
+    if(['Promoción','Escrito'].includes(a.tipo)) e.esperandoAuto=true;
+    persist('expedientes',e); toast('Acción terminada'); render(); }, {submit:'Terminar'}); }
+function registrarAcuerdo(expId){
+  const opts=S.expedientes.filter(e=>e.estado!=='terminado').map(e=>[e.id, `${e.numero} · ${e.cliente}`]);
+  if(!opts.length){ toast('Primero da de alta un expediente'); return; }
+  formModal('Registrar acuerdo publicado',[
+    {k:'expedienteId',label:'Expediente',type:'select',options:opts,value:expId||opts[0][0]},
+    {k:'fecha',label:'Fecha de publicación',type:'date',value:todayISO(),required:true,half:true},
+    {k:'plazo',label:'Plazo que corre (si aplica)',type:'date',half:true,hint:'<span class="lnk" onclick="calcPlazo()">Calcular a partir de días hábiles</span>'},
+    {k:'sintesis',label:'Qué se acordó',required:true,type:'textarea'},
+    {k:'accion',label:'Acción a seguir',placeholder:'Designar perito · Desahogar vista · Solo registrar'},
+    {k:'crear',label:'Crear la acción en el expediente con este plazo',type:'checkbox',value:true},
+  ], v=>{
+    const e=exp(v.expedienteId); if(!e) return 'Expediente no encontrado';
+    S.acuerdos.push({id:uid(), fecha:v.fecha, expedienteId:e.id, sintesis:v.sintesis, accion:v.accion, plazo:v.plazo, registradoPor:quien()}); lsSave(); dbWrite('acuerdos',S.acuerdos[S.acuerdos.length-1]);
+    e.esperandoAuto=false; e.bitacora=e.bitacora||[]; e.bitacora.push({id:uid(), fecha:v.fecha, texto:`Se registró acuerdo: ${v.sintesis}`, quien:quien()});
+    if(v.crear && v.accion && v.accion.toLowerCase()!=='solo registrar'){ e.acciones=e.acciones||[]; e.acciones.push({id:uid(), titulo:v.accion, tipo:'Promoción', responsable:e.responsable||quien(), plazo:v.plazo, revisa:'', aprueba:'', estado:'pendiente', notas:'Derivada del acuerdo del '+fmt(v.fecha)}); }
+    persist('expedientes',e); toast('Acuerdo registrado'); render(); });
+}
+function nuevoDocumento(id){ const e=exp(id); formModal('Registrar documento del expediente',[{k:'nombre',label:'Nombre de la constancia',required:true,placeholder:'06 Auto que admite pruebas'},{k:'fecha',label:'Fecha',type:'date',value:todayISO(),required:true}], v=>{ e.documentos=e.documentos||[]; e.documentos.push({id:uid(), nombre:v.nombre, fecha:v.fecha, quien:quien()}); addBit('expedientes',e,`Se agregó documento: ${v.nombre}`); persist('expedientes',e); render(); }); }
+function quitarDocumento(id,did){ const e=exp(id); confirmModal('¿Quitar este documento de la lista?',()=>{ e.documentos=e.documentos.filter(d=>d.id!==did); persist('expedientes',e); render(); },'Quitar'); }
+function nuevaBitacora(kind,id){ const o=S[kind].find(x=>x.id===id); formModal('Anotar en la bitácora',[{k:'texto',label:'Qué pasó',required:true,type:'textarea'},{k:'fecha',label:'Fecha',type:'date',value:todayISO(),required:true}], v=>{ o.bitacora=o.bitacora||[]; o.bitacora.push({id:uid(), fecha:v.fecha, texto:v.texto, quien:quien()}); persist(kind,o); render(); }); }
+function informeExpediente(id){ const e=exp(id); const u=ultima(e); const pend=pendientes(e);
+  const txt=`Estimado cliente:\n\nLe comparto el estado del asunto ${e.numero}, ${e.tipo||e.materia}, que se tramita ante el ${e.juzgado}, en el que usted comparece como ${(e.caracter||'parte').toLowerCase()} frente a ${e.contraparte||'la contraparte'}.\n\nEl expediente se encuentra en la etapa de ${e.etapa.toLowerCase()}.${e.audiencia?` La próxima audiencia está señalada para el ${fmt(e.audiencia,true)}.`:''}\n\nÚltima actuación: ${u?`${fmt(u.fecha,true)}, ${u.texto.toLowerCase()}.`:'sin actuaciones recientes.'}\n\n${pend.length?`Lo que sigue:\n${pend.map(a=>`- ${a.titulo}${a.plazo?` (${fmt(a.plazo,true)})`:''}`).join('\n')}`:'Por el momento estamos en espera de que el juzgado acuerde lo conducente.'}\n\nQuedo atento a cualquier duda.\n\n${quien()}`;
+  textModal('Informe al cliente', txt, 'Texto listo para pegar en un correo. Ajusta lo que haga falta antes de enviarlo.'); }
+/* ---------- CORPORATIVO: derivados ---------- */
+function vencimientos(){ // eventos corporativos con fecha
+  const ev=[];
+  S.clientes.forEach(c=>{
+    (c.contratos||[]).forEach(k=>{ if(k.vencimiento) ev.push({fecha:k.vencimiento, cliente:c, tipo:'Contrato', txt:`${k.nombre} vence`}); });
+    (c.poderes||[]).forEach(p=>{ if(p.vigencia&&!p.revocado) ev.push({fecha:p.vigencia, cliente:c, tipo:'Poder', txt:`Poder de ${p.apoderado} vence`}); });
+    (c.cumplimiento||[]).forEach(m=>{ if(m.fecha&&m.estado!=='cumplido') ev.push({fecha:m.fecha, cliente:c, tipo:'Cumplimiento', txt:m.item}); });
+    (c.contingencias||[]).forEach(g=>{ if(g.fecha&&g.estado!=='cerrada') ev.push({fecha:g.fecha, cliente:c, tipo:'Contingencia', txt:g.accion}); });
+    if(c.dd&&c.dd.proximo) ev.push({fecha:c.dd.proximo, cliente:c, tipo:'Due diligence', txt:'Due diligence semestral'});
+  });
+  return ev.sort((a,b)=>a.fecha.localeCompare(b.fecha));
+}
+function chipFecha(f){ const n=daysUntil(f); if(n==null) return ''; return `<span class="chip ${n<0?'red':n<=7?'red':n<=30?'amb':'blu'}">${n<0?'Vencido · ':''}${fmt(f)}</span>`; }
+function cliPendientes(c){ let n=0; n+=(c.contingencias||[]).filter(g=>g.estado!=='cerrada').length; n+=(c.cumplimiento||[]).filter(m=>m.estado!=='cumplido'&&m.fecha&&daysUntil(m.fecha)<=30).length; n+=(c.contratos||[]).filter(k=>k.vencimiento&&daysUntil(k.vencimiento)<=30).length; n+=(c.poderes||[]).filter(p=>p.vigencia&&!p.revocado&&daysUntil(p.vigencia)<=30).length; n+=(c.poderes||[]).filter(p=>p.revocado&&!p.inscrito).length; return n; }
+function cliRow(c){ const n=cliPendientes(c); const venc=(c.cumplimiento||[]).some(m=>m.estado==='vencido'||(m.estado!=='cumplido'&&m.fecha&&daysUntil(m.fecha)<0)); return `<div class="row click" onclick="go('#/cliente/${c.id}')"><div><b>${esc(c.razon)}</b><div class="m">${esc(c.servicio||'')} · ${(c.contratos||[]).length} contratos · ${esc(c.responsable||'')}</div></div><div class="r">${venc?'<span class="chip red">Vencido</span>':n?`<span class="chip amb">${n} pendiente${n>1?'s':''}</span>`:'<span class="chip grn">Al día</span>'}</div></div>`; }
+const ETIQ_TRAM = e => { const i=ETAPAS_TRAM.findIndex(x=>x[0]===e); return ETAPAS_TRAM[i<0?0:i][1]; };
+function tramRow(t){ const c=cli(t.clienteId); const bloq=(t.documentos||[]).some(d=>d.bloquea&&d.estado!=='recibido'); const cls=t.etapa==='concluido'?'grn':t.etapa==='prevencion'||bloq?'amb':t.etapa==='documentacion'||t.etapa==='ingreso'?'blu':'gry'; return `<div class="row click" onclick="go('#/tramite/${t.id}')"><div><b>${esc(t.tipo)}${t.descripcion?' · '+esc(t.descripcion):''}</b><div class="m">${c?esc(c.razon):'—'} · ${esc(t.dependencia||'')}</div></div><div class="r"><span class="chip ${cls}">${ETIQ_TRAM(t.etapa)}</span>${t.fechaMeta&&t.etapa!=='concluido'?chipFecha(t.fechaMeta):''}</div></div>`; }
+
+/* ---------- CORPORATIVO: tablero ---------- */
+VIEWS.corporativo = () => {
+  const T=todayISO(); const ev=vencimientos(); const prox=ev.filter(e=>daysUntil(e.fecha)<=30);
+  const porCel=S.clientes.flatMap(c=>(c.porCelebrar||[]).map(k=>({k,c}))).filter(x=>x.k.estado!=='firmado');
+  const cont=S.clientes.flatMap(c=>(c.contingencias||[]).map(g=>({g,c}))).filter(x=>x.g.estado!=='cerrada').sort((a,b)=>({alto:0,medio:1,bajo:2})[a.g.riesgo]-({alto:0,medio:1,bajo:2})[b.g.riesgo]);
+  const tramEnCurso=S.tramites.filter(t=>t.etapa!=='concluido');
+  return head('Servicios corporativos', fmtLong(T), '', `<button class="btn" onclick="nuevoTramite()">+ Nuevo trámite</button><button class="btn p" onclick="nuevoCliente()">+ Nuevo cliente</button>`) + welcome() + `
+  <div class="metrics">
+    <div class="metric" onclick="go('#/clientes')"><div class="l">Clientes</div><div class="v">${S.clientes.length}</div></div>
+    <div class="metric" onclick="go('#/calendario')"><div class="l">Vencimientos en 30 días</div><div class="v" style="color:${prox.length?'var(--amb-t)':'inherit'}">${prox.length}</div></div>
+    <div class="metric"><div class="l">Contratos por celebrar</div><div class="v">${porCel.length}</div></div>
+    <div class="metric" onclick="go('#/tramites')"><div class="l">Trámites en curso</div><div class="v">${tramEnCurso.length}</div></div>
+  </div>
+  <div class="cols c3"><div>
+    <div class="card"><h3>Vencimientos próximos<a href="#/calendario">Ver calendario</a></h3>${ev.filter(e=>daysUntil(e.fecha)<=90).slice(0,8).map(e=>`<div class="row click" onclick="go('#/cliente/${e.cliente.id}')"><div><b>${esc(e.cliente.razon)}</b><div class="m">${esc(e.tipo)}: ${esc(e.txt)}</div></div><div class="r">${chipFecha(e.fecha)}</div></div>`).join('')||'<div class="empty">Nada en los próximos 90 días.</div>'}</div>
+    <div class="card"><h3>Due diligence semestral</h3>${S.clientes.filter(c=>c.dd&&(c.dd.proximo||c.dd.ultimo)).map(c=>`<div class="row click" onclick="go('#/cliente/${c.id}')"><div><b>${esc(c.razon)}</b><div class="m">Último: ${c.dd.ultimo?fmt(c.dd.ultimo,true):'—'} · ${c.dd.abiertos||0} hallazgos abiertos</div></div><div class="r">${c.dd.proximo?chipFecha(c.dd.proximo):''}</div></div>`).join('')||'<div class="empty">Programa el due diligence desde la ficha de cada cliente.</div>'}</div>
+  </div><div>
+    <div class="card"><h3>Contratos próximos a celebrar</h3>${porCel.map(({k,c})=>{ const [lab,cls]=EST_CON[k.estado]||EST_CON.elaboracion; return `<div class="row click" onclick="go('#/cliente/${c.id}')"><div><b>${esc(k.nombre)}</b><div class="m">${esc(c.razon)} · ${k.estado==='elaboracion'?'Elabora '+esc(k.elabora):k.estado==='revision'?'Revisa '+esc(k.revisa):'Aprueba '+esc(k.aprueba)}</div></div><div class="r"><span class="chip ${cls}">${lab}</span></div></div>`; }).join('')||'<div class="empty">Ninguno en proceso.</div>'}</div>
+    <div class="card"><h3>Contingencias en litigio (preventivas)</h3>${cont.map(({g,c})=>{ const [lab,cls]=RIESGOS[g.riesgo]||RIESGOS.bajo; return `<div class="row click" onclick="go('#/cliente/${c.id}')"><div><b>${esc(c.razon)}</b><div class="m">${esc(g.hecho)} · ${esc(g.accion)}</div></div><div class="r"><span class="chip ${cls}">${lab}</span></div></div>`; }).join('')||'<div class="empty">Sin contingencias abiertas.</div>'}</div>
+  </div><div>
+    ${clientesCard()}
+    <div class="card"><h3>Trámites en curso<a href="#/tramites">Ver todos</a></h3>${tramEnCurso.slice(0,6).map(tramRow).join('')||'<div class="empty">Sin trámites en curso.</div>'}</div>
+  </div></div>`;
+};
+function clientesCard(){ const l=S.clientes.filter(c=>filtroCli==='Todos'||(filtroCli==='Pendientes'?cliPendientes(c)>0:c.servicio===filtroCli)); return `<div class="card"><h3>Clientes<span class="lnk" onclick="nuevoCliente()">+ Nuevo</span></h3><div class="filters">${['Todos','Iguala mensual','Por proyecto','Pendientes'].map(f=>`<span class="${filtroCli===f?'on':''}" onclick="filtroCli='${f}';render()">${f}</span>`).join('')}</div>${l.map(cliRow).join('')||'<div class="empty">Sin clientes en este filtro.</div>'}</div>`; }
+VIEWS.clientes = () => head('Clientes', `${S.clientes.length} en total`, '<a href="#/corporativo">Servicios corporativos</a> · Clientes', `<button class="btn p" onclick="nuevoCliente()">+ Nuevo cliente</button>`) + clientesCard();
+
+/* ---------- CORPORATIVO: ficha de cliente ---------- */
+VIEWS.cliente = r => {
+  const c=cli(r.id); if(!c) return head('Cliente no encontrado','','<a href="#/clientes">Clientes</a>');
+  const u=[...(c.bitacora||[])].sort(byDateDesc)[0]; const n=cliPendientes(c);
+  const carpetas=CARPETAS.map(k=>({k, docs:(c.documentos||[]).filter(d=>d.carpeta===k)}));
+  const proxVenc=vencimientos().filter(e=>e.cliente.id===c.id)[0];
+  const tram=S.tramites.filter(t=>t.clienteId===c.id); const exps=S.expedientes.filter(e=>e.cliente===c.razon);
+  const porRenovar=(c.poderes||[]).filter(p=>p.vigencia&&!p.revocado&&daysUntil(p.vigencia)<=60).length, revSinInscribir=(c.poderes||[]).filter(p=>p.revocado&&!p.inscrito).length;
+  const contPorVencer=(c.contratos||[]).filter(k=>k.vencimiento&&daysUntil(k.vencimiento)<=90).length, contSinFirma=(c.contratos||[]).filter(k=>!k.firmado).length;
+  const cumplPend=(c.cumplimiento||[]).filter(m=>m.estado!=='cumplido').length;
+  return head(c.razon, '', `<a href="#/corporativo">Servicios corporativos</a> · <a href="#/clientes">Clientes</a> · ${esc(c.razon)}`) + `
+  <div class="hdr"><div class="top"><div><div class="t">${esc(c.razon)}</div><div class="s">${esc(c.servicio||'')} · Responsable: ${esc(c.responsable||'—')}${c.desde?' · Cliente desde '+esc(c.desde):''}</div></div>
+    <div class="acts">${n?`<span class="chip amb">${n} pendiente${n>1?'s':''}</span>`:'<span class="chip grn">Al corriente</span>'}<button class="btn" onclick="editarCliente('${c.id}')">Editar</button><button class="btn" onclick="informeCliente('${c.id}')">Informe al cliente</button><button class="btn p" onclick="nuevoTramite('${c.id}')">+ Trámite</button></div></div>
+    <div class="grid">
+      <div><div class="l">Representante legal</div><div class="v">${esc(c.representante||'—')}</div></div>
+      <div><div class="l">Contacto</div><div class="v">${esc(c.contacto||'—')}</div></div>
+      <div><div class="l">Última asamblea</div><div class="v">${(()=>{ const a=(c.cumplimiento||[]).filter(m=>/asamblea/i.test(m.item)&&m.estado==='cumplido').sort(byDateDesc)[0]; return a?fmt(a.fecha,true):'—'; })()}</div></div>
+      <div><div class="l">Próximo vencimiento</div><div class="v" style="${proxVenc&&daysUntil(proxVenc.fecha)<=30?'color:var(--amb-t)':''}">${proxVenc?esc(proxVenc.txt)+' · '+fmt(proxVenc.fecha):'—'}</div></div>
+    </div></div>
+  <div class="metrics">
+    <div class="metric"><div class="l">Contratos vigentes</div><div class="v">${(c.contratos||[]).length}</div></div>
+    <div class="metric"><div class="l">Contratos por celebrar</div><div class="v">${(c.porCelebrar||[]).filter(k=>k.estado!=='firmado').length}</div></div>
+    <div class="metric"><div class="l">Poderes vigentes</div><div class="v">${(c.poderes||[]).filter(p=>!p.revocado).length}</div></div>
+    <div class="metric"><div class="l">Contingencias abiertas</div><div class="v" style="color:${(c.contingencias||[]).some(g=>g.estado!=='cerrada'&&g.riesgo==='alto')?'var(--red-t)':'inherit'}">${(c.contingencias||[]).filter(g=>g.estado!=='cerrada').length}</div></div>
+  </div>
+  <div class="cols c2"><div>
+    <div class="card"><h3>Documentos del cliente<span class="lnk" onclick="nuevoDocCliente('${c.id}')">+ Registrar</span></h3>
+      ${carpetas.map(({k,docs})=>`<div class="row"><div><b>${esc(k)}</b>${docs.length?`<div class="m">${docs.map(d=>`${esc(d.nombre)} (${fmt(d.fecha,true)}) <span class="lnk" onclick="quitarDocCliente('${c.id}','${d.id}')">×</span>`).join('<br>')}</div>`:'<div class="m">Vacía</div>'}</div><div class="r"><span class="mini">${docs.length}</span></div></div>`).join('')}</div>
+    <div class="card"><h3>Due diligence semestral<span class="lnk" onclick="editarDD('${c.id}')">Programar</span></h3>
+      <div class="row"><div><b>Último: ${c.dd&&c.dd.ultimo?fmt(c.dd.ultimo,true):'—'}</b><div class="m">Próximo: ${c.dd&&c.dd.proximo?fmt(c.dd.proximo,true):'—'} · ${c.dd?c.dd.hallazgos||0:0} hallazgos, ${c.dd?c.dd.abiertos||0:0} abiertos</div></div><div class="r">${c.dd&&c.dd.proximo?chipFecha(c.dd.proximo):''}</div></div>
+      <div class="row"><div><b>Matriz de contratos</b><div class="m">${(c.contratos||[]).length} registrados · ${contPorVencer} vencen en 90 días · ${contSinFirma} sin firma</div></div><div class="r"><span class="chip ${contSinFirma||contPorVencer?'amb':'grn'}">${contSinFirma||contPorVencer?'Revisar':'Al día'}</span></div></div>
+      <div class="row"><div><b>Matriz de poderes</b><div class="m">${(c.poderes||[]).filter(p=>!p.revocado).length} vigentes · ${porRenovar} por renovar · ${revSinInscribir} revocado${revSinInscribir!==1?'s':''} sin inscribir</div></div><div class="r"><span class="chip ${porRenovar||revSinInscribir?'amb':'grn'}">${porRenovar||revSinInscribir?'Revisar':'Al día'}</span></div></div>
+      <div class="row"><div><b>Cumplimiento corporativo</b><div class="m">Asamblea anual, beneficiario controlador, inscripciones en RPC</div></div><div class="r"><span class="chip ${cumplPend?'amb':'grn'}">${cumplPend?cumplPend+' pendiente'+(cumplPend>1?'s':''):'Al día'}</span></div></div>
+    </div>
+    <div class="card"><h3>Matriz de poderes<span class="lnk" onclick="nuevoPoder('${c.id}')">+ Poder</span></h3>
+      ${(c.poderes||[]).map(p=>`<div class="row"><div><b>${esc(p.apoderado)}</b><div class="m">${esc(p.facultades||'')} · ${esc(p.notaria||'')} · ${p.fecha?fmt(p.fecha,true):''}${p.vigencia?' · vence '+fmt(p.vigencia,true):' · sin vigencia límite'}</div><div class="m"><span class="lnk" onclick="editarPoder('${c.id}','${p.id}')">editar</span></div></div><div class="r">${p.revocado?`<span class="chip ${p.inscrito?'gry':'red'}">${p.inscrito?'Revocado':'Revocado sin inscribir'}</span>`:p.vigencia&&daysUntil(p.vigencia)<=60?chipFecha(p.vigencia):`<span class="chip ${p.inscrito?'grn':'amb'}">${p.inscrito?'Vigente':'Sin inscribir'}</span>`}</div></div>`).join('')||'<div class="empty">Sin poderes registrados.</div>'}</div>
+    <div class="card"><h3>Cumplimiento corporativo<span class="lnk" onclick="nuevoCumpl('${c.id}')">+ Obligación</span></h3>
+      ${[...(c.cumplimiento||[])].sort((a,b)=>(a.fecha||'9').localeCompare(b.fecha||'9')).map(m=>`<div class="row"><div><b>${esc(m.item)}</b><div class="m">${m.fecha?fmt(m.fecha,true):'Sin fecha'} · <span class="lnk" onclick="toggleCumpl('${c.id}','${m.id}')">${m.estado==='cumplido'?'marcar pendiente':'marcar cumplido'}</span></div></div><div class="r">${m.estado==='cumplido'?'<span class="chip grn">Cumplido</span>':m.fecha?chipFecha(m.fecha):'<span class="chip gry">Pendiente</span>'}</div></div>`).join('')||'<div class="empty">Sin obligaciones registradas.</div>'}</div>
+  </div><div>
+    <div class="card"><h3>Contratos próximos a celebrar<span class="lnk" onclick="nuevoPorCelebrar('${c.id}')">+ Nuevo</span></h3>
+      <div class="tw"><table><tr><th>Contrato</th><th>Elabora</th><th>Revisa</th><th>Aprueba</th><th>Estado</th><th></th></tr>
+      ${(c.porCelebrar||[]).filter(k=>k.estado!=='firmado').map(k=>{ const [lab,cls]=EST_CON[k.estado]||EST_CON.elaboracion; const next=FLUJO_CON[FLUJO_CON.indexOf(k.estado)+1]; const btn=next==='firmado'?`<button class="btn sm p" onclick="firmarContrato('${c.id}','${k.id}')">Firmado</button>`:next?`<button class="btn sm" onclick="avanzarContrato('${c.id}','${k.id}')">${next==='revision'?'A revisión':next==='aprobacion'?'Por aprobar':'Aprobar'}</button>`:''; return `<tr><td><b>${esc(k.nombre)}</b>${k.notas?`<br><span class="mini">${esc(k.notas)}</span>`:''}</td><td>${esc(k.elabora||'—')}</td><td>${esc(k.revisa||'—')}</td><td>${esc(k.aprueba||'—')}</td><td><span class="chip ${cls}">${lab}</span></td><td style="white-space:nowrap">${btn} <span class="lnk" onclick="editarPorCelebrar('${c.id}','${k.id}')">editar</span></td></tr>`; }).join('')||'<tr><td colspan="6" class="empty">Ninguno en proceso.</td></tr>'}</table></div>
+      <div class="note">Flujo: en elaboración → en revisión → por aprobar → aprobado → firmado. Al marcarlo firmado pasa a la matriz de contratos celebrados.</div></div>
+    ${tram.length?`<div class="card"><h3>Trámites<span class="lnk" onclick="nuevoTramite('${c.id}')">+ Nuevo</span></h3>${tram.map(tramRow).join('')}</div>`:''}
+    <div class="card"><h3>Bitácora del cliente<span class="lnk" onclick="nuevaBitacora('clientes','${c.id}')">+ Anotar</span></h3>
+      ${[...(c.bitacora||[])].sort(byDateDesc).slice(0,8).map(b=>`<div class="row"><div><b>${fmt(b.fecha,true)} · ${esc(b.texto)}</b><div class="m">${esc(b.quien)}</div></div></div>`).join('')||'<div class="empty">Sin registros.</div>'}</div>
+    <div class="card"><h3>Contingencias en litigio<span class="lnk" onclick="nuevaConting('${c.id}')">+ Registrar</span></h3>
+      ${(c.contingencias||[]).map(g=>{ const [lab,cls]=RIESGOS[g.riesgo]||RIESGOS.bajo; return `<div class="row"><div><b>${esc(g.hecho)}</b><div class="m">Acción preventiva: ${esc(g.accion||'—')} · ${esc(g.responsable||'')}${g.fecha?' · '+fmt(g.fecha):''}</div><div class="m"><span class="lnk" onclick="editarConting('${c.id}','${g.id}')">editar</span> · <span class="lnk" onclick="contingAExpediente('${c.id}','${g.id}')">convertir en expediente</span></div></div><div class="r">${g.estado==='cerrada'?'<span class="chip grn">Cerrada</span>':`<span class="chip ${cls}">${lab}</span>`}</div></div>`; }).join('')||'<div class="empty">Sin contingencias.</div>'}</div>
+    <div class="card"><h3>Contratos celebrados<span class="lnk" onclick="nuevoContrato('${c.id}')">+ Contrato</span></h3>
+      ${[...(c.contratos||[])].sort((a,b)=>(a.vencimiento||'9').localeCompare(b.vencimiento||'9')).map(k=>`<div class="row"><div><b>${esc(k.nombre)}</b><div class="m">${esc(k.contraparte||'')}${k.objeto?' · '+esc(k.objeto):''} · ${k.vencimiento?'vence '+fmt(k.vencimiento,true):'sin vencimiento'}${k.renovacion?' · '+esc(k.renovacion):''}</div><div class="m"><span class="lnk" onclick="editarContrato('${c.id}','${k.id}')">editar</span></div></div><div class="r">${!k.firmado?'<span class="chip amb">Sin firma</span>':k.vencimiento&&daysUntil(k.vencimiento)<=90?chipFecha(k.vencimiento):'<span class="chip grn">Vigente</span>'}</div></div>`).join('')||'<div class="empty">Sin contratos registrados.</div>'}</div>
+    ${exps.length?`<div class="card"><h3>Litigios de este cliente</h3>${exps.map(e=>expRow(e)).join('')}</div>`:''}
+  </div></div>`;
+};
+
+/* ---------- CORPORATIVO: acciones ---------- */
+const cliFields = c => [
+  {k:'razon',label:'Razón social',required:true,value:c.razon},
+  {k:'rfc',label:'RFC',value:c.rfc,half:true},{k:'desde',label:'Cliente desde (año)',value:c.desde,half:true},
+  {k:'representante',label:'Representante legal',value:c.representante,half:true},{k:'contacto',label:'Contacto operativo',value:c.contacto,half:true,placeholder:'Nombre · teléfono o correo'},
+  {k:'servicio',label:'Tipo de servicio',type:'select',options:['Iguala mensual','Por proyecto'],value:c.servicio||'Iguala mensual',half:true},
+  {k:'responsable',label:'Responsable interno',type:'select',options:userOpts(true),value:c.responsable||quien(),half:true},
+];
+function nuevoCliente(){ formModal('Nuevo cliente', cliFields({}), v=>{ const c={id:uid(), ...v, documentos:[], contratos:[], porCelebrar:[], poderes:[], contingencias:[], cumplimiento:[], dd:{ultimo:'',proximo:'',hallazgos:0,abiertos:0}, bitacora:[]}; addBit('clientes',c,'Se dio de alta al cliente'); persist('clientes',c); toast('Cliente creado'); go('#/cliente/'+c.id); }); }
+function editarCliente(id){ const c=cli(id); formModal('Editar cliente', cliFields(c), v=>{ Object.assign(c,v); persist('clientes',c); render(); }, {extra:`<button type="button" class="btn danger" onclick="closeModal();confirmModal('¿Eliminar este cliente con todo su contenido?',()=>{removeItem('clientes','${id}');go('#/clientes');})">Eliminar</button>`}); }
+function nuevoDocCliente(id){ const c=cli(id); formModal('Registrar documento',[{k:'carpeta',label:'Carpeta',type:'select',options:CARPETAS},{k:'nombre',label:'Documento',required:true,placeholder:'Escritura 4,512 · Acta de asamblea abril 2026'},{k:'fecha',label:'Fecha',type:'date',value:todayISO(),required:true}], v=>{ c.documentos=c.documentos||[]; c.documentos.push({id:uid(),...v}); persist('clientes',c); render(); }); }
+function quitarDocCliente(id,did){ const c=cli(id); confirmModal('¿Quitar este documento de la lista?',()=>{ c.documentos=c.documentos.filter(d=>d.id!==did); persist('clientes',c); render(); },'Quitar'); }
+function editarDD(id){ const c=cli(id); const d=c.dd||{}; formModal('Due diligence semestral',[{k:'ultimo',label:'Último entregado',type:'date',value:d.ultimo,half:true},{k:'proximo',label:'Próximo programado',type:'date',value:d.proximo,half:true},{k:'hallazgos',label:'Hallazgos del último',type:'number',value:d.hallazgos||0,half:true},{k:'abiertos',label:'Hallazgos abiertos',type:'number',value:d.abiertos||0,half:true}], v=>{ c.dd={ultimo:v.ultimo,proximo:v.proximo,hallazgos:Number(v.hallazgos)||0,abiertos:Number(v.abiertos)||0}; persist('clientes',c); render(); }); }
+const podFields = p => [{k:'apoderado',label:'Apoderado',required:true,value:p.apoderado},{k:'facultades',label:'Facultades',value:p.facultades,placeholder:'Pleitos y cobranzas, actos de administración…'},{k:'notaria',label:'Notaría',value:p.notaria,half:true},{k:'fecha',label:'Fecha de otorgamiento',type:'date',value:p.fecha,half:true},{k:'vigencia',label:'Vigencia (vacío si es indefinida)',type:'date',value:p.vigencia},{k:'inscrito',label:'Inscrito en el Registro Público',type:'checkbox',value:p.inscrito},{k:'revocado',label:'Revocado',type:'checkbox',value:p.revocado}];
+function nuevoPoder(id){ const c=cli(id); formModal('Nuevo poder', podFields({inscrito:true}), v=>{ c.poderes=c.poderes||[]; c.poderes.push({id:uid(),...v}); persist('clientes',c); render(); }); }
+function editarPoder(id,pid){ const c=cli(id); const p=c.poderes.find(x=>x.id===pid); formModal('Editar poder', podFields(p), v=>{ Object.assign(p,v); persist('clientes',c); render(); }, {extra:`<button type="button" class="btn danger" onclick="closeModal();const c=cli('${id}');c.poderes=c.poderes.filter(x=>x.id!=='${pid}');persist('clientes',c);render()">Eliminar</button>`}); }
+function nuevoCumpl(id){ const c=cli(id); formModal('Obligación corporativa',[{k:'item',label:'Obligación',required:true,placeholder:'Asamblea ordinaria anual 2027 · Aviso de beneficiario controlador'},{k:'fecha',label:'Fecha límite',type:'date'}], v=>{ c.cumplimiento=c.cumplimiento||[]; c.cumplimiento.push({id:uid(),item:v.item,fecha:v.fecha,estado:'pendiente'}); persist('clientes',c); render(); }); }
+function toggleCumpl(id,mid){ const c=cli(id); const m=c.cumplimiento.find(x=>x.id===mid); m.estado=m.estado==='cumplido'?'pendiente':'cumplido'; if(m.estado==='cumplido') addBit('clientes',c,`Cumplido: ${m.item}`); persist('clientes',c); render(); }
+const contFields = g => [{k:'hecho',label:'Hecho o riesgo detectado',required:true,type:'textarea',value:g.hecho},{k:'riesgo',label:'Nivel de riesgo',type:'select',options:[['alto','Alto'],['medio','Medio'],['bajo','Bajo']],value:g.riesgo||'medio',half:true},{k:'fecha',label:'Fecha para la acción',type:'date',value:g.fecha,half:true},{k:'accion',label:'Acción preventiva',value:g.accion},{k:'responsable',label:'Responsable',type:'select',options:userOpts(true),value:g.responsable||quien()},{k:'estado',label:'Estado',type:'select',options:[['abierta','Abierta'],['cerrada','Cerrada']],value:g.estado||'abierta'}];
+function nuevaConting(id){ const c=cli(id); formModal('Registrar contingencia', contFields({}), v=>{ c.contingencias=c.contingencias||[]; c.contingencias.push({id:uid(),...v}); addBit('clientes',c,`Contingencia registrada: ${v.hecho}`); persist('clientes',c); render(); }); }
+function editarConting(id,gid){ const c=cli(id); const g=c.contingencias.find(x=>x.id===gid); formModal('Editar contingencia', contFields(g), v=>{ Object.assign(g,v); persist('clientes',c); render(); }, {extra:`<button type="button" class="btn danger" onclick="closeModal();const c=cli('${id}');c.contingencias=c.contingencias.filter(x=>x.id!=='${gid}');persist('clientes',c);render()">Eliminar</button>`}); }
+function contingAExpediente(id,gid){ const c=cli(id); const g=c.contingencias.find(x=>x.id===gid); formModal('Convertir en expediente de litigio', expFields({cliente:c.razon, responsable:c.responsable, contraparte:'', tipo:''}), v=>{ const e={id:uid(), ...v, estado:'activo', esperandoAuto:false, acciones:[], bitacora:[], documentos:[]}; addBit('expedientes',e,`Creado a partir de la contingencia: ${g.hecho}`); persist('expedientes',e); g.estado='cerrada'; addBit('clientes',c,`La contingencia "${g.hecho}" pasó a litigio (${e.numero})`); persist('clientes',c); go('#/expediente/'+e.id); }); }
+const konFields = k => [{k:'nombre',label:'Contrato',required:true,value:k.nombre},{k:'contraparte',label:'Contraparte',value:k.contraparte,half:true},{k:'objeto',label:'Objeto',value:k.objeto,half:true},{k:'inicio',label:'Inicio',type:'date',value:k.inicio,half:true},{k:'vencimiento',label:'Vencimiento',type:'date',value:k.vencimiento,half:true},{k:'renovacion',label:'Renovación',type:'select',options:['Automática anual','Por convenio','No aplica'],value:k.renovacion||'Por convenio'},{k:'firmado',label:'Firmado por todas las partes',type:'checkbox',value:k.firmado!==false}];
+function nuevoContrato(id){ const c=cli(id); formModal('Contrato celebrado', konFields({firmado:true}), v=>{ c.contratos=c.contratos||[]; c.contratos.push({id:uid(),...v}); persist('clientes',c); render(); }); }
+function editarContrato(id,kid){ const c=cli(id); const k=c.contratos.find(x=>x.id===kid); formModal('Editar contrato', konFields(k), v=>{ Object.assign(k,v); persist('clientes',c); render(); }, {extra:`<button type="button" class="btn danger" onclick="closeModal();const c=cli('${id}');c.contratos=c.contratos.filter(x=>x.id!=='${kid}');persist('clientes',c);render()">Eliminar</button>`}); }
+const pcFields = k => [{k:'nombre',label:'Contrato',required:true,value:k.nombre},{k:'elabora',label:'Elabora',value:k.elabora||quien(),half:true,hint:'Puede ser alguien externo (notaría, contraparte)'},{k:'revisa',label:'Revisa',type:'select',options:userOpts(true),value:k.revisa||'',half:true},{k:'aprueba',label:'Aprueba',type:'select',options:userOpts(true),value:k.aprueba||''},{k:'notas',label:'Notas',value:k.notas}];
+function nuevoPorCelebrar(id){ const c=cli(id); formModal('Contrato por celebrar', pcFields({}), v=>{ c.porCelebrar=c.porCelebrar||[]; c.porCelebrar.push({id:uid(),...v,estado:'elaboracion'}); persist('clientes',c); render(); }); }
+function editarPorCelebrar(id,kid){ const c=cli(id); const k=c.porCelebrar.find(x=>x.id===kid); formModal('Editar contrato por celebrar', [...pcFields(k),{k:'estado',label:'Estado',type:'select',options:Object.entries(EST_CON).map(([a,b])=>[a,b[0]]),value:k.estado}], v=>{ Object.assign(k,v); persist('clientes',c); render(); }, {extra:`<button type="button" class="btn danger" onclick="closeModal();const c=cli('${id}');c.porCelebrar=c.porCelebrar.filter(x=>x.id!=='${kid}');persist('clientes',c);render()">Eliminar</button>`}); }
+function avanzarContrato(id,kid){ const c=cli(id); const k=c.porCelebrar.find(x=>x.id===kid); const next=FLUJO_CON[FLUJO_CON.indexOf(k.estado)+1]; if(!next||next==='firmado') return; if(next==='aprobado' && k.aprueba && k.aprueba!==quien() && !confirm(`Este contrato lo aprueba ${k.aprueba}. ¿Aprobar de todos modos como ${quien()}?`)) return; k.estado=next; if(next==='aprobado') addBit('clientes',c,`Aprobado: ${k.nombre}`); persist('clientes',c); render(); }
+function firmarContrato(id,kid){ const c=cli(id); const k=c.porCelebrar.find(x=>x.id===kid); formModal('Contrato firmado', konFields({nombre:k.nombre, firmado:true, inicio:todayISO()}), v=>{ c.contratos=c.contratos||[]; c.contratos.push({id:uid(),...v}); c.porCelebrar=c.porCelebrar.filter(x=>x.id!==kid); addBit('clientes',c,`Firmado: ${v.nombre}`); persist('clientes',c); toast('Pasó a contratos celebrados'); render(); }, {submit:'Registrar firma'}); }
+function informeCliente(id){ const c=cli(id); const ev=vencimientos().filter(e=>e.cliente.id===c.id&&daysUntil(e.fecha)<=90); const pc=(c.porCelebrar||[]).filter(k=>k.estado!=='firmado'); const cont=(c.contingencias||[]).filter(g=>g.estado!=='cerrada'); const tram=S.tramites.filter(t=>t.clienteId===c.id&&t.etapa!=='concluido');
+  const txt=`Estimado ${c.representante||'cliente'}:\n\nLe comparto el estado de los asuntos corporativos de ${c.razon} al ${fmt(todayISO(),true)}.\n\n${ev.length?`Vencimientos en los próximos 90 días:\n${ev.map(e=>`- ${e.txt} (${fmt(e.fecha,true)})`).join('\n')}\n\n`:''}${pc.length?`Contratos en proceso:\n${pc.map(k=>`- ${k.nombre}: ${(EST_CON[k.estado]||EST_CON.elaboracion)[0].toLowerCase()}`).join('\n')}\n\n`:''}${cont.length?`Contingencias que estamos atendiendo:\n${cont.map(g=>`- ${g.hecho}. Acción: ${g.accion||'en análisis'}`).join('\n')}\n\n`:''}${tram.length?`Trámites en curso:\n${tram.map(t=>`- ${t.tipo}${t.descripcion?' ('+t.descripcion+')':''}: ${ETIQ_TRAM(t.etapa).toLowerCase()}`).join('\n')}\n\n`:''}Quedo atento a cualquier duda.\n\n${quien()}`;
+  textModal('Informe al cliente', txt, 'Texto listo para pegar en un correo. Ajusta lo que haga falta antes de enviarlo.'); }
+/* ---------- TRÁMITES ---------- */
+VIEWS.tramites = () => head('Trámites para clientes', `${S.tramites.filter(t=>t.etapa!=='concluido').length} en curso`, '<a href="#/corporativo">Servicios corporativos</a> · Trámites', `<button class="btn p" onclick="nuevoTramite()">+ Nuevo trámite</button>`) + `<div class="card"><h3>En curso</h3>${S.tramites.filter(t=>t.etapa!=='concluido').map(tramRow).join('')||'<div class="empty">Sin trámites en curso.</div>'}</div><div class="card"><h3>Concluidos</h3>${S.tramites.filter(t=>t.etapa==='concluido').map(tramRow).join('')||'<div class="empty">Ninguno.</div>'}</div>`;
+VIEWS.tramite = r => {
+  const t=tra(r.id); if(!t) return head('Trámite no encontrado','','<a href="#/tramites">Trámites</a>');
+  const c=cli(t.clienteId); const docs=t.documentos||[]; const rec=docs.filter(d=>d.estado==='recibido').length; const idx=ETAPAS_TRAM.findIndex(x=>x[0]===t.etapa);
+  const otros=S.tramites.filter(x=>x.clienteId===t.clienteId&&x.id!==t.id);
+  return head(t.tipo, t.descripcion, `<a href="#/corporativo">Servicios corporativos</a> · <a href="#/tramites">Trámites</a>${c?` · <a href="#/cliente/${c.id}">${esc(c.razon)}</a>`:''}`) + `
+  <div class="hdr"><div class="top"><div><div class="t">${esc(t.tipo)}${t.descripcion?' · '+esc(t.descripcion):''}</div><div class="s">Cliente: ${c?esc(c.razon):'—'} · Responsable interno: ${esc(t.responsable||'—')}</div></div>
+    <div class="acts"><span class="chip ${t.etapa==='concluido'?'grn':'blu'}">${ETIQ_TRAM(t.etapa)}</span><button class="btn" onclick="editarTramite('${t.id}')">Editar</button><button class="btn" onclick="informeTramite('${t.id}')">Informe al cliente</button>${idx>0?`<button class="btn" onclick="etapaTramite('${t.id}',-1)">Regresar etapa</button>`:''}${t.etapa!=='concluido'?`<button class="btn p" onclick="etapaTramite('${t.id}',1)">Avanzar a ${ETAPAS_TRAM[idx+1][1].toLowerCase()}</button>`:''}</div></div>
+    <div class="grid">
+      <div><div class="l">Dependencia</div><div class="v">${esc(t.dependencia||'—')}</div></div>
+      <div><div class="l">${t.etapa==='documentacion'?'Fecha meta de ingreso':'Fecha de ingreso'}</div><div class="v" style="${t.fechaMeta&&daysUntil(t.fechaMeta)<=7&&t.etapa==='documentacion'?'color:var(--amb-t)':''}">${t.fechaMeta?fmt(t.fechaMeta,true):'—'}</div></div>
+      <div><div class="l">Plazo de respuesta</div><div class="v">${esc(t.plazoRespuesta||'—')}</div></div>
+      <div><div class="l">Derechos estimados</div><div class="v">${money(t.derechos)}</div></div>
+    </div>
+    <div class="steps">${ETAPAS_TRAM.slice(0,5).map((s,i)=>`<div class="step ${i<idx||t.etapa==='concluido'?'done':i===idx?'on':''}">${s[1]}</div>`).join('')}</div></div>
+  <div class="cols c21"><div>
+    <div class="card"><h3>Documentación requerida<span>${rec} de ${docs.length} · <span class="lnk" onclick="nuevoDocTram('${t.id}')">+ Documento</span></span></h3>
+      <div class="tw"><table><tr><th style="min-width:200px">Documento</th><th>Quién lo entrega</th><th>Fecha</th><th>Estado</th><th></th></tr>
+      ${docs.map(d=>`<tr class="${d.estado==='recibido'?'done':''}"><td><span class="chk ${d.estado==='recibido'?'on':''}" onclick="toggleDocTram('${t.id}','${d.id}')">${d.estado==='recibido'?'✓':''}</span>${esc(d.nombre)}</td><td>${esc(d.entrega||'—')}</td><td>${d.fecha?fmt(d.fecha):'—'}</td><td>${d.estado==='recibido'?'<span class="chip grn">Recibido</span>':d.bloquea?'<span class="chip red">Bloquea</span>':/cliente/i.test(d.entrega||'')?'<span class="chip gry">Pendiente</span>':'<span class="chip amb">Externo</span>'}</td><td><span class="lnk" onclick="editarDocTram('${t.id}','${d.id}')">editar</span></td></tr>`).join('')||'<tr><td colspan="5" class="empty">Sin documentos. Agrega los que pide la dependencia.</td></tr>'}</table></div>
+      <div class="note">"Bloquea" marca el documento que detiene todo el trámite, normalmente uno que depende de otro trámite previo.</div></div>
+    <div class="card"><h3>Bitácora del trámite<span class="lnk" onclick="nuevaBitacora('tramites','${t.id}')">+ Anotar</span></h3>${[...(t.bitacora||[])].sort(byDateDesc).map(b=>`<div class="row"><div><b>${fmt(b.fecha,true)} · ${esc(b.texto)}</b><div class="m">${esc(b.quien)}</div></div></div>`).join('')||'<div class="empty">Sin registros.</div>'}</div>
+  </div><div>
+    <div class="card"><h3>Personas coadyuvantes<span class="lnk" onclick="nuevoCoad('${t.id}')">+ Agregar</span></h3>
+      ${(t.coadyuvantes||[]).map(p=>{ const pend=docs.filter(d=>d.estado!=='recibido'&&(d.entrega||'').toLowerCase().includes((p.nombre||'').toLowerCase().split(' ').slice(-1)[0].toLowerCase())).length; return `<div class="row"><div style="display:flex;align-items:center"><span class="av">${initials(p.nombre)}</span><div><b>${esc(p.nombre)}</b><div class="m">${esc(p.funcion||'')}${p.contacto?' · '+esc(p.contacto):''} · <span class="lnk" onclick="editarCoad('${t.id}','${p.id}')">editar</span></div></div></div><div class="r">${pend?`<span class="chip amb">${pend} pendiente${pend>1?'s':''}</span>`:'<span class="chip grn">Al día</span>'}</div></div>`; }).join('')||'<div class="empty">Sin coadyuvantes. Agrega ingenieros, gestores, arquitectos o contactos del cliente.</div>'}</div>
+    ${otros.length?`<div class="card"><h3>Otros trámites del cliente</h3>${otros.map(tramRow).join('')}</div>`:''}
+  </div></div>`;
+};
+const tramFields = t => [
+  {k:'clienteId',label:'Cliente',type:'select',options:S.clientes.map(c=>[c.id,c.razon]),value:t.clienteId||(S.clientes[0]&&S.clientes[0].id),required:true},
+  {k:'tipo',label:'Tipo de trámite',type:'select',options:Object.keys(TIPOS_TRAM),value:t.tipo||'Licencia de construcción',half:true,hint:'Al crearlo se precarga la lista de documentos usual'},
+  {k:'descripcion',label:'Descripción breve',value:t.descripcion,half:true,placeholder:'Nave 2, El Marqués'},
+  {k:'dependencia',label:'Dependencia',value:t.dependencia,placeholder:'Desarrollo Urbano, Municipio de…'},
+  {k:'responsable',label:'Responsable interno',type:'select',options:userOpts(true),value:t.responsable||quien(),half:true},
+  {k:'fechaMeta',label:'Fecha meta de ingreso',type:'date',value:t.fechaMeta,half:true},
+  {k:'plazoRespuesta',label:'Plazo de respuesta de la autoridad',value:t.plazoRespuesta,half:true,placeholder:'15 días hábiles'},
+  {k:'derechos',label:'Derechos estimados (MXN)',type:'number',value:t.derechos,half:true},
+];
+function nuevoTramite(clienteId){ if(!S.clientes.length){ toast('Primero da de alta un cliente'); return; } formModal('Nuevo trámite', tramFields({clienteId}), v=>{ const t={id:uid(), ...v, etapa:'documentacion', documentos:(TIPOS_TRAM[v.tipo]||[]).map(n=>({id:uid(),nombre:n,entrega:'',fecha:'',estado:'pendiente',bloquea:false})), coadyuvantes:[], bitacora:[]}; addBit('tramites',t,'Se abrió el trámite'); persist('tramites',t); toast('Trámite creado'); go('#/tramite/'+t.id); }); }
+function editarTramite(id){ const t=tra(id); formModal('Editar trámite', tramFields(t), v=>{ Object.assign(t,v); persist('tramites',t); render(); }, {extra:`<button type="button" class="btn danger" onclick="closeModal();confirmModal('¿Eliminar este trámite?',()=>{removeItem('tramites','${id}');go('#/tramites');})">Eliminar</button>`}); }
+function etapaTramite(id,dir){ const t=tra(id); const i=ETAPAS_TRAM.findIndex(x=>x[0]===t.etapa); const j=i+dir; if(j<0||j>=ETAPAS_TRAM.length) return; if(dir>0&&t.etapa==='documentacion'){ const falt=(t.documentos||[]).filter(d=>d.estado!=='recibido'); if(falt.length&&!confirm(`Faltan ${falt.length} documentos por recibir. ¿Avanzar de todos modos?`)) return; } t.etapa=ETAPAS_TRAM[j][0]; addBit('tramites',t,`Etapa: ${ETAPAS_TRAM[j][1]}`); persist('tramites',t); render(); }
+const docTramFields = d => [{k:'nombre',label:'Documento',required:true,value:d.nombre},{k:'entrega',label:'Quién lo entrega',value:d.entrega,placeholder:'Cliente · Despacho · Ing. Carlos Vega (DRO)',half:true},{k:'fecha',label:'Fecha compromiso o de recepción',type:'date',value:d.fecha,half:true},{k:'estado',label:'Estado',type:'select',options:[['pendiente','Pendiente'],['recibido','Recibido']],value:d.estado||'pendiente'},{k:'bloquea',label:'Bloquea el trámite (depende de otro trámite previo)',type:'checkbox',value:d.bloquea}];
+function nuevoDocTram(id){ const t=tra(id); formModal('Documento requerido', docTramFields({}), v=>{ t.documentos=t.documentos||[]; t.documentos.push({id:uid(),...v}); persist('tramites',t); render(); }); }
+function editarDocTram(id,did){ const t=tra(id); const d=t.documentos.find(x=>x.id===did); formModal('Editar documento', docTramFields(d), v=>{ Object.assign(d,v); persist('tramites',t); render(); }, {extra:`<button type="button" class="btn danger" onclick="closeModal();const t=tra('${id}');t.documentos=t.documentos.filter(x=>x.id!=='${did}');persist('tramites',t);render()">Eliminar</button>`}); }
+function toggleDocTram(id,did){ const t=tra(id); const d=t.documentos.find(x=>x.id===did); d.estado=d.estado==='recibido'?'pendiente':'recibido'; if(d.estado==='recibido'){ d.fecha=d.fecha||todayISO(); addBit('tramites',t,`Se recibió: ${d.nombre}`); } persist('tramites',t); render(); }
+const coadFields = p => [{k:'nombre',label:'Nombre',required:true,value:p.nombre},{k:'funcion',label:'Función',value:p.funcion,placeholder:'Director responsable de obra · Gestor · Contacto del cliente'},{k:'contacto',label:'Contacto',value:p.contacto}];
+function nuevoCoad(id){ const t=tra(id); formModal('Persona coadyuvante', coadFields({}), v=>{ t.coadyuvantes=t.coadyuvantes||[]; t.coadyuvantes.push({id:uid(),...v}); persist('tramites',t); render(); }); }
+function editarCoad(id,pid){ const t=tra(id); const p=t.coadyuvantes.find(x=>x.id===pid); formModal('Editar coadyuvante', coadFields(p), v=>{ Object.assign(p,v); persist('tramites',t); render(); }, {extra:`<button type="button" class="btn danger" onclick="closeModal();const t=tra('${id}');t.coadyuvantes=t.coadyuvantes.filter(x=>x.id!=='${pid}');persist('tramites',t);render()">Quitar</button>`}); }
+function informeTramite(id){ const t=tra(id); const c=cli(t.clienteId); const docs=t.documentos||[]; const falt=docs.filter(d=>d.estado!=='recibido');
+  const txt=`Estimado ${c&&c.representante?c.representante:'cliente'}:\n\nLe informo el avance del trámite de ${t.tipo.toLowerCase()}${t.descripcion?' ('+t.descripcion+')':''} ante ${t.dependencia||'la dependencia'}.\n\nEtapa actual: ${ETIQ_TRAM(t.etapa).toLowerCase()}.${t.fechaMeta?` ${t.etapa==='documentacion'?'Fecha meta de ingreso':'Fecha de ingreso'}: ${fmt(t.fechaMeta,true)}.`:''}${t.plazoRespuesta?` Plazo de respuesta de la autoridad: ${t.plazoRespuesta}.`:''}\n\nDocumentación: ${docs.length-falt.length} de ${docs.length} documentos recibidos.${falt.length?`\nPendientes:\n${falt.map(d=>`- ${d.nombre}${d.entrega?` (entrega ${d.entrega})`:''}${d.bloquea?' · detiene el trámite':''}`).join('\n')}`:''}\n\nQuedo atento a cualquier duda.\n\n${quien()}`;
+  textModal('Informe al cliente', txt, 'Texto listo para pegar en un correo.'); }
+
+/* ---------- CALENDARIO ---------- */
+VIEWS.calendario = () => {
+  const ev=[];
+  S.expedientes.filter(e=>e.estado!=='terminado').forEach(e=>{ if(e.audiencia) ev.push({fecha:e.audiencia, tipo:'Audiencia', txt:`${e.numero} · ${e.cliente}`, go:'#/expediente/'+e.id, cls:'blu'}); pendientes(e).forEach(a=>{ if(a.plazo) ev.push({fecha:a.plazo, tipo:'Plazo', txt:`${a.titulo} · ${e.numero} · ${a.responsable||''}`, go:'#/expediente/'+e.id, cls:'amb'}); }); });
+  vencimientos().forEach(v=>ev.push({fecha:v.fecha, tipo:v.tipo, txt:`${v.txt} · ${v.cliente.razon}`, go:'#/cliente/'+v.cliente.id, cls:'gry'}));
+  S.tramites.filter(t=>t.etapa!=='concluido').forEach(t=>{ if(t.fechaMeta&&t.etapa==='documentacion') ev.push({fecha:t.fechaMeta, tipo:'Trámite', txt:`Ingresar ${t.tipo.toLowerCase()} · ${(cli(t.clienteId)||{}).razon||''}`, go:'#/tramite/'+t.id, cls:'blu'}); (t.documentos||[]).filter(d=>d.estado!=='recibido'&&d.fecha).forEach(d=>ev.push({fecha:d.fecha, tipo:'Documento', txt:`${d.nombre} · ${d.entrega||''} · ${t.tipo}`, go:'#/tramite/'+t.id, cls:'gry'})); });
+  ev.sort((a,b)=>a.fecha.localeCompare(b.fecha));
+  const T=todayISO(); const venc=ev.filter(e=>e.fecha<T); const prox=ev.filter(e=>e.fecha>=T&&daysUntil(e.fecha)<=120);
+  const dias=[...new Set(prox.map(e=>e.fecha))];
+  const item=e=>`<div class="row click" onclick="go('${e.go}')"><div><b>${esc(e.txt)}</b></div><div class="r"><span class="chip ${e.cls}">${esc(e.tipo)}</span></div></div>`;
+  return head('Calendario', 'audiencias, plazos y vencimientos', '') + `<div class="cols c2"><div>
+    ${venc.length?`<div class="card"><h3 style="color:var(--red-t)">Vencidos sin atender</h3>${venc.map(e=>`<div class="row click" onclick="go('${e.go}')"><div><b>${esc(e.txt)}</b><div class="m">${fmt(e.fecha,true)}</div></div><div class="r"><span class="chip red">${esc(e.tipo)}</span></div></div>`).join('')}</div>`:''}
+    ${dias.slice(0,Math.ceil(dias.length/2)).map(d=>`<div class="card cal-day ${daysUntil(d)<=3?'over':''}"><h3>${fmtLong(d)}${daysUntil(d)===0?' (hoy)':daysUntil(d)===1?' (mañana)':''}</h3>${prox.filter(e=>e.fecha===d).map(item).join('')}</div>`).join('')}
+  </div><div>${dias.slice(Math.ceil(dias.length/2)).map(d=>`<div class="card"><h3>${fmtLong(d)}</h3>${prox.filter(e=>e.fecha===d).map(item).join('')}</div>`).join('')}</div></div>${!ev.length?'<div class="card"><div class="empty">Sin fechas registradas.</div></div>':''}`;
+};
+
+/* ---------- EQUIPO ---------- */
+VIEWS.equipo = () => {
+  const cards=S.usuarios.map(u=>{
+    const n=u.nombre; const items=[];
+    S.expedientes.filter(e=>e.estado!=='terminado').forEach(e=>pendientes(e).forEach(a=>{ const rol=a.estado==='revision'&&a.revisa===n?'Revisar':a.estado==='aprobada'&&a.responsable===n?'Presentar':(a.estado==='revision'||a.estado==='aprobada')&&a.aprueba===n&&a.estado==='revision'&&!a.revisa?'Aprobar':a.estado==='revision'&&a.aprueba===n&&a.revisa===n?'Revisar y aprobar':(a.responsable===n&&['pendiente','elaboracion'].includes(a.estado))?'Elaborar':null; if(rol) items.push({txt:`${a.titulo} · ${e.numero}`, sub:a.plazo?fmt(a.plazo):'sin plazo', go:'#/expediente/'+e.id, chip:rol, cls:a.plazo&&daysUntil(a.plazo)<=3?'red':a.plazo&&daysUntil(a.plazo)<=7?'amb':'blu', o:a.plazo||'9'}); }));
+    S.clientes.forEach(c=>(c.porCelebrar||[]).filter(k=>k.estado!=='firmado').forEach(k=>{ const rol=k.estado==='elaboracion'&&k.elabora===n?'Elaborar':k.estado==='revision'&&k.revisa===n?'Revisar':k.estado==='aprobacion'&&k.aprueba===n?'Aprobar':null; if(rol) items.push({txt:`${k.nombre} · ${c.razon}`, sub:'contrato', go:'#/cliente/'+c.id, chip:rol, cls:'blu', o:'8'}); }));
+    S.clientes.forEach(c=>(c.contingencias||[]).filter(g=>g.estado!=='cerrada'&&g.responsable===n).forEach(g=>items.push({txt:`${g.accion||g.hecho} · ${c.razon}`, sub:g.fecha?fmt(g.fecha):'contingencia', go:'#/cliente/'+c.id, chip:'Prevenir', cls:g.riesgo==='alto'?'red':'amb', o:g.fecha||'9'})));
+    S.tramites.filter(t=>t.etapa!=='concluido'&&t.responsable===n).forEach(t=>items.push({txt:`${t.tipo} · ${(cli(t.clienteId)||{}).razon||''}`, sub:ETIQ_TRAM(t.etapa), go:'#/tramite/'+t.id, chip:'Trámite', cls:'gry', o:t.fechaMeta||'9'}));
+    items.sort((a,b)=>a.o.localeCompare(b.o));
+    return `<div class="card"><h3><span><span class="av">${initials(n)}</span>${esc(n)} <span class="mini">· ${esc(u.rol||'')}</span></span><span class="mini">${items.length} tarea${items.length!==1?'s':''}</span></h3>${items.map(i=>`<div class="row click" onclick="go('${i.go}')"><div><b>${esc(i.txt)}</b><div class="m">${esc(i.sub)}</div></div><div class="r"><span class="chip ${i.cls}">${i.chip}</span></div></div>`).join('')||'<div class="empty">Sin pendientes.</div>'}</div>`;
+  });
+  return head('Equipo y tareas', 'lo que cada quien tiene en la mesa', '', `<button class="btn" onclick="go('#/config')">Administrar equipo</button>`) + (cards.length?`<div class="cols c2"><div>${cards.filter((_,i)=>i%2===0).join('')}</div><div>${cards.filter((_,i)=>i%2===1).join('')}</div></div>`:'<div class="card"><div class="empty">Da de alta a tu equipo en Configuración.</div></div>');
+};
+
+/* ---------- CONFIGURACIÓN ---------- */
+VIEWS.config = () => head('Configuración','', '') + `<div class="cols c2"><div>
+  <div class="card"><h3>Equipo<span class="lnk" onclick="nuevoUsuario()">+ Agregar</span></h3>${S.usuarios.map(u=>`<div class="row"><div style="display:flex;align-items:center"><span class="av">${initials(u.nombre)}</span><div><b>${esc(u.nombre)}</b><div class="m">${esc(u.rol||'')}</div></div></div><div class="r"><span class="lnk" onclick="editarUsuario('${u.id}')">editar</span></div></div>`).join('')||'<div class="empty">Sin integrantes. Agrega al menos a quien elabora, quien revisa y quien aprueba.</div>'}</div>
+  <div class="card"><h3>Datos</h3><div class="note">${db?'Los datos se comparten con todos los integrantes de tu organización que abran esta página.':'Los datos viven en este navegador. Para pasarlos a otra persona, exporta e importa el respaldo.'}</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;padding-bottom:12px"><button class="btn" onclick="cargarEjemplo()">Cargar datos de ejemplo</button><button class="btn" onclick="exportar()">Exportar respaldo</button><button class="btn" onclick="importar()">Importar respaldo</button><button class="btn danger" onclick="confirmModal('¿Borrar todos los datos del prototipo?',borrarTodo,'Borrar todo')">Borrar todo</button></div></div>
+  </div><div>
+  <div class="card"><h3>Apariencia</h3><div class="row"><div><b>Tema</b><div class="m">Sigue al sistema, o fíjalo.</div></div><div class="r"><select id="temaSel" onchange="setTema(this.value)"><option value="">Automático</option><option value="light">Claro</option><option value="dark">Oscuro</option></select></div></div></div>
+  <div class="card"><h3>Cómo funciona este prototipo</h3><div class="note">Cada acción de un expediente sigue el flujo pendiente → en elaboración → en revisión → aprobada → terminada; la casilla de terminada exige la aprobación previa. Al terminar una promoción o escrito, el expediente queda "esperando auto" hasta que se registra el acuerdo. Los plazos se marcan en rojo a tres días y en ámbar a siete; un expediente sin actuación en 30 días se marca en ámbar y en 60 en rojo. Los contratos por celebrar siguen el mismo flujo y al firmarse pasan a la matriz de contratos. Los archivos (PDF de las constancias) todavía no se suben aquí: se registra nombre y fecha, y el archivo vive en el repositorio del despacho.</div></div>
+  </div></div>`;
+function nuevoUsuario(){ formModal('Integrante del equipo',[{k:'nombre',label:'Nombre',required:true,placeholder:'Lic. Nombre Apellido'},{k:'rol',label:'Rol',placeholder:'Abogado, auxiliar, socio…'}], v=>{ const u={id:uid(),...v}; persist('usuarios',u); if(!yo()) setYo(u.nombre); render(); }); }
+function editarUsuario(id){ const u=S.usuarios.find(x=>x.id===id); formModal('Editar integrante',[{k:'nombre',label:'Nombre',required:true,value:u.nombre},{k:'rol',label:'Rol',value:u.rol}], v=>{ Object.assign(u,v); persist('usuarios',u); render(); }, {extra:`<button type="button" class="btn danger" onclick="closeModal();removeItem('usuarios','${id}');render()">Quitar</button>`}); }
+function exportar(){ textModal('Respaldo (JSON)', JSON.stringify(S), 'Copia este texto y guárdalo. Para restaurarlo en otro navegador usa "Importar respaldo".'); }
+function importar(){ openModal(`<h2>Importar respaldo</h2><div class="note">Pega aquí el JSON exportado. Reemplaza los datos actuales.</div><div class="f"><textarea id="imp" style="min-height:200px"></textarea></div><div class="err" id="ierr"></div><div class="macts"><button class="btn" id="ic">Cancelar</button><button class="btn p" id="io">Importar</button></div>`); $('#ic').onclick=closeModal; $('#io').onclick=()=>{ try{ const o=JSON.parse($('#imp').value); if(!o||typeof o!=='object') throw 0; KINDS.forEach(k=>{ S[k]=Array.isArray(o[k])?o[k]:[]; }); lsSave(); if(db) KINDS.forEach(k=>S[k].forEach(x=>dbWrite(k,x))); closeModal(); toast('Respaldo importado'); render(); }catch(e){ $('#ierr').textContent='El texto no es un respaldo válido.'; } }; }
+function setTema(v){ try{ localStorage.setItem('despacho_tema',v); }catch(e){} document.documentElement.setAttribute('data-theme', v); if(!v) document.documentElement.removeAttribute('data-theme'); }
+function initTema(){ let v=''; try{ v=localStorage.getItem('despacho_tema')||''; }catch(e){} if(v) document.documentElement.setAttribute('data-theme',v); const s=$('#temaSel'); if(s) s.value=v; }
+
+/* ---------- inicio ---------- */
+(function init(){
+  const had = lsLoad();
+  initTema();
+  render();
+  const obs=new MutationObserver(()=>{ const s=$('#temaSel'); if(s){ let v=''; try{ v=localStorage.getItem('despacho_tema')||''; }catch(e){} s.value=v; } }); obs.observe($('#main'),{childList:true});
+  connectDb().then(()=>{
+    // sin base compartida y sin datos locales: cargar ejemplo para que el prototipo se pueda recorrer
+    setTimeout(()=>{ if(!db && !had && !S.expedientes.length && !S.usuarios.length){ const d=seed(); KINDS.forEach(k=>S[k]=d[k]); lsSave(); render(); } }, 50);
+  });
+})();
+</script>
+</body>
+</html>

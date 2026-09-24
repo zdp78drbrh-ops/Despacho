@@ -1,0 +1,4 @@
+{% extends "registration/_simple.html" %}
+{% block cuerpo %}<h2>Recuperar contraseña</h2><div class="note">Escribe tu correo y te enviaremos un enlace para definir una nueva.</div>
+<form method="post">{% csrf_token %}{% include "registration/_campos.html" %}
+<div class="macts"><a class="btn" href="{% url 'entrar' %}">Cancelar</a><button class="btn p" type="submit">Enviar enlace</button></div></form>{% endblock %}

@@ -1,0 +1,12 @@
+{% load static %}<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Despacho · Gestión jurídica</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/despacho.css' %}">
+<script>try{var t=localStorage.getItem('despacho_tema');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+</head><body>
+<div style="min-height:100%;display:flex;align-items:flex-start;justify-content:center;padding:10vh 16px 20px">
+<div class="md" style="max-width:400px">
+<div style="font-size:17px;font-weight:600;margin-bottom:2px">Despacho</div><div class="mini" style="margin-bottom:16px">Gestión jurídica</div>
+{% block cuerpo %}{% endblock %}
+</div></div></body></html>

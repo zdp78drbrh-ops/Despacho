@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block main %}
+<div class="h"><h1>Configuración</h1><div class="hdr-acts"></div></div>
+<div class="cols c2"><div>
+  <div class="card"><h3>Equipo{% if user.es_admin %}<span class="lnk" data-modal="{% url 'usuario_nuevo' %}">+ Agregar</span>{% endif %}</h3>
+  {% for u in usuarios %}<div class="row"><div style="display:flex;align-items:center"><span class="av">{{ u.nombre|iniciales }}</span><div><b>{{ u.nombre }}{% if not u.is_active %} <span class="chip gry">Inactivo</span>{% endif %}</b><div class="m">{{ u.get_rol_display }} · {{ u.email }}{% if u.is_staff %} · administrador{% endif %}</div></div></div><div class="r">{% if user.es_admin %}<span class="lnk" data-modal="{% url 'usuario_editar' u.pk %}">editar</span><span class="lnk" data-post="{% url 'usuario_reenviar' u.pk %}" data-confirm="¿Enviar a {{ u.email }} un enlace para definir su contraseña?" data-confirm-label="Enviar">enviar acceso</span>{% endif %}</div></div>
+  {% empty %}<div class="empty">Sin integrantes. Agrega al menos a quien elabora, quien revisa y quien aprueba.</div>{% endfor %}</div>
+  <div class="card"><h3>Datos</h3><div class="note">Los datos se guardan en la base de datos del despacho y se comparten con todo el equipo. Se respaldan automáticamente cada noche en un proveedor externo; los PDF se guardan con historial de versiones. Nada se borra físicamente: lo eliminado queda dado de baja y registrado en la bitácora de auditoría.</div>
+  <div style="display:flex;gap:6px;flex-wrap:wrap;padding-bottom:12px"><a class="btn" href="{% url 'auditoria' %}">Bitácora de auditoría</a></div></div>
+</div><div>
+  <div class="card"><h3>Apariencia</h3><div class="row"><div><b>Tema</b><div class="m">Sigue al sistema, o fíjalo.</div></div><div class="r"><select id="temaSel" onchange="setTema(this.value)"><option value="">Automático</option><option value="light">Claro</option><option value="dark">Oscuro</option></select></div></div></div>
+  <div class="card"><h3>Cómo funciona</h3><div class="note">Cada acción de un expediente sigue el flujo pendiente → en elaboración → en revisión → aprobada → terminada; la casilla de terminada exige la aprobación previa. Solo quien tiene el rol de aprobar puede aprobar (si la acción no tiene aprobador, basta con su revisor). Al terminar una promoción o escrito, el expediente queda "esperando auto" hasta que se registra el acuerdo. Los plazos se marcan en rojo a tres días y en ámbar a siete; un expediente sin actuación en 30 días se marca en ámbar y en 60 en rojo. Los PDF de las constancias se suben en "Expediente digitalizado" y quedan guardados por cliente y expediente.</div></div>
+</div></div>
+{% endblock %}

@@ -1,0 +1,5 @@
+{% extends "registration/_simple.html" %}
+{% block cuerpo %}{% if validlink %}<h2>Define tu contraseña</h2>
+<form method="post">{% csrf_token %}{% include "registration/_campos.html" %}<div class="note">Mínimo 10 caracteres.</div>
+<div class="macts"><button class="btn p" type="submit">Guardar</button></div></form>
+{% else %}<h2>Enlace no válido</h2><div class="note">El enlace ya se usó o venció. Pide uno nuevo.</div><div class="macts"><a class="btn p" href="{% url 'contrasena_recuperar' %}">Pedir otro enlace</a></div>{% endif %}{% endblock %}

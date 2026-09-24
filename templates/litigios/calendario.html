@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block main %}
+<div class="h"><h1>Calendario<span>audiencias, plazos y vencimientos</span></h1><div class="hdr-acts"></div></div>
+<div class="cols c2"><div>
+  {% if venc %}<div class="card"><h3 style="color:var(--red-t)">Vencidos sin atender</h3>{% for x in venc %}<div class="row click" data-href="{{ x.go }}"><div><b>{{ x.txt }}</b><div class="m">{{ x.fecha|fmt:True }}</div></div><div class="r"><span class="chip red">{{ x.tipo }}</span></div></div>{% endfor %}</div>{% endif %}
+  {% for d in col1 %}<div class="card cal-day {% if d.n <= 3 %}over{% endif %}"><h3>{{ d.fecha|fmt_largo }}{% if d.n == 0 %} (hoy){% elif d.n == 1 %} (mañana){% endif %}</h3>{% for x in d.items %}<div class="row click" data-href="{{ x.go }}"><div><b>{{ x.txt }}</b></div><div class="r"><span class="chip {{ x.cls }}">{{ x.tipo }}</span></div></div>{% endfor %}</div>{% endfor %}
+</div><div>{% for d in col2 %}<div class="card"><h3>{{ d.fecha|fmt_largo }}</h3>{% for x in d.items %}<div class="row click" data-href="{{ x.go }}"><div><b>{{ x.txt }}</b></div><div class="r"><span class="chip {{ x.cls }}">{{ x.tipo }}</span></div></div>{% endfor %}</div>{% endfor %}</div></div>
+{% if vacio %}<div class="card"><div class="empty">Sin fechas registradas.</div></div>{% endif %}
+{% endblock %}

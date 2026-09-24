@@ -1,0 +1,2 @@
+{# recRow(e, x) #}
+<div class="row click" data-href="{% url 'expediente' e.pk %}"><div><b>{{ x.titulo }}</b>{% with p=x|prox_accion_recurso %}<div class="m">{{ e.numero }} · {{ e.cliente.razon }} · {{ x.etapa }}{% if p %} · {{ p.titulo }}{% endif %}</div></div><div class="r">{% chip x.chip %}{% if p %}{% chip_plazo p.plazo %}{% endif %}{% chip x.chip_suspension %}</div></div>{% endwith %}
