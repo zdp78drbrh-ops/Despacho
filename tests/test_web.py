@@ -172,3 +172,9 @@ def test_informe_al_cliente(cliente_web, expediente):
     txt = r.content.decode()
     assert "Le comparto el estado del asunto 312/2025, Oral mercantil" in txt
     assert "Por el momento estamos en espera de que el juzgado acuerde lo conducente." in txt
+
+
+def test_salud_sin_host_valido_ni_https(client, db, settings):
+    settings.SECURE_SSL_REDIRECT = True
+    r = client.get("/salud/", HTTP_HOST="10.0.0.7:8000")
+    assert r.status_code == 200 and r.content == b"ok"

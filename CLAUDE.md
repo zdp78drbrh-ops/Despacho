@@ -319,8 +319,11 @@ se puede revertir si el despacho lo pide.
       auditoría inmutable encadenada, tablero, expedientes, ficha, acciones con flujo y aprobación, esperando auto,
       semáforo, acuerdos, apelaciones y amparos, PDF (subir/adjuntar/descargar/quitar), informe al cliente,
       calendario y equipo (solo litigios), consulta de auditoría, respaldos + programador, importador del prototipo,
-      datos de ejemplo. 83 pruebas en verde; recorrido en navegador (escritorio y móvil) sin errores de JS.
-- [ ] Crear cuentas de §5, desplegar, primer administrador y **primera prueba de restauración** (docs/operacion.md §4).
+      datos de ejemplo. 84 pruebas en verde; recorrido en navegador (escritorio y móvil) sin errores de JS.
+- [x] `.do/app.yaml` reducido a la publicación inicial (app + base + PDF, rama de trabajo, `${APP_DOMAIN}`);
+      correo, respaldos y worker `programador` se agregan después (ver comentarios del archivo).
+- [ ] (sesión 3, en curso) El despacho está creando la cuenta de DigitalOcean: clúster `despacho-db`, Space
+      `despacho-pdf`, luego App con el spec. Crear cuentas restantes de §5, primer administrador y **primera prueba de restauración** (docs/operacion.md §4).
       Con eso se cierra la fase 1 ("listo cuando": expediente real de punta a punta + restauración exitosa).
 - [ ] Probar respaldos contra B2 real (el volcado y la restauración ya se probaron en local; la subida a S3 no).
 - [ ] Fase 2: días inhábiles, correos de plazo en rojo (tabla `NotificacionEnviada` ya existe), resumen semanal.
